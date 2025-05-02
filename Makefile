@@ -29,6 +29,12 @@ build: ## Builds the Docker images
 up: ## Start the docker hub in detached mode (no logs)
 	@HTTP_PORT=$(HTTP_PORT) HTTPS_PORT=$(HTTPS_PORT) HTTP3_PORT=$(HTTP3_PORT) $(DOCKER_COMP) up --detach
 
+xon: ## Start the docker hub with Xdebug enabled
+	@XDEBUG_MODE=debug HTTP_PORT=$(HTTP_PORT) HTTPS_PORT=$(HTTPS_PORT) HTTP3_PORT=$(HTTP3_PORT) $(DOCKER_COMP) up --detach
+
+xoff: ## Start the docker hub with Xdebug disabled
+	@XDEBUG_MODE=off HTTP_PORT=$(HTTP_PORT) HTTPS_PORT=$(HTTPS_PORT) HTTP3_PORT=$(HTTP3_PORT) $(DOCKER_COMP) up --detach
+
 start: build up ## Build and start the containers
 
 down: ## Stop the docker hub
