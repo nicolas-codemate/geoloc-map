@@ -31,6 +31,7 @@ class MapController extends AbstractController
         try {
             $mapConfig = $configBuilder->buildMapConfig($name);
         } catch (MapConfigNotFoundException) {
+            $logger->info(sprintf('Map config "%s" not found.', $name));
             throw $this->createNotFoundException();
         }
 
@@ -52,6 +53,19 @@ class MapController extends AbstractController
                         )
                     )
             );
+
+
+        // out of time ranges, act like there are no markers
+        if (false === $mapConfig->timeRangeContainer->isCurrentTimeInRanges()) {
+            $logger->info(sprintf('Out of time ranges: %s', $mapConfig->timeRangeContainer));
+
+            return $this->render('ux_packages/map.html.twig', [
+                'map' => $map->fitBoundsToMarkers(),
+                'height' => $request->get('height', 500),
+                'refreshInterval' => $mapConfig->refreshInterval,
+                'hasMarkers' => false,
+            ]);
+        }
 
         $hasMarkers = false;
 

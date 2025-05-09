@@ -8,7 +8,7 @@ namespace App\Model;
 
 interface MapConfigInterface
 {
-    public string $name {
+    public string $mapName {
         get;
     }
 

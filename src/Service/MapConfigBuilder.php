@@ -10,6 +10,8 @@ use App\Model\Coordinates;
 use App\Model\GeolocatableObject;
 use App\Model\MapConfig;
 use App\Model\MapConfigInterface;
+use App\Model\TimeRange;
+use App\Model\TimeRangeContainer;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -24,7 +26,7 @@ readonly class MapConfigBuilder
 
     public function buildMapConfig(string $mapName): MapConfigInterface
     {
-        $config = array_find($this->geolocatableObjects, static fn($object) => isset($object['name']) && $object['name'] === $mapName);
+        $config = array_find($this->geolocatableObjects, static fn($object) => isset($object['mapName']) && $object['mapName'] === $mapName);
         if (!$config) {
             throw new MapConfigNotFoundException($mapName);
         }
@@ -43,6 +45,21 @@ readonly class MapConfigBuilder
             );
         }
 
+        $timeRanges = [];
+        if (isset($config['time_ranges']) && is_array($config['time_ranges'])) {
+            foreach ($config['time_ranges'] as $timeRange) {
+                if (isset($timeRange['startTime'], $timeRange['endTime'])) {
+                    $days = $timeRange['days'] ?? null;
+
+                    $timeRanges[] = new TimeRange(
+                        days: $days,
+                        startTime: $timeRange['startTime'],
+                        endTime: $timeRange['endTime'],
+                    );
+                }
+            }
+        }
+
         return new MapConfig(
             $mapName,
             new Coordinates(
@@ -51,6 +68,9 @@ readonly class MapConfigBuilder
             ),
             $config['default_zoom_level'] ?? 12,
             $config['refresh_interval'] ?? 5000, // in milliseconds
+            new TimeRangeContainer(
+                ...$timeRanges,
+            ),
             ...$objects,
         );
     }

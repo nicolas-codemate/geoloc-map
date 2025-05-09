@@ -15,10 +15,11 @@ class MapConfig implements MapConfigInterface
     }
 
     public function __construct(
-        public string $name,
+        public string $mapName,
         public Coordinates $defaultCoordinates,
         public int $defaultZoomLevel,
         public int $refreshInterval,
+        public TimeRangeContainer $timeRangeContainer,
         GeolocatableObjectInterface ...$geolocatableObjects,
     ) {
         $this->geolocatableObjects = $geolocatableObjects;
