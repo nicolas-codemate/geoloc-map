@@ -21,13 +21,6 @@ services:
     extra_hosts:
       # Ensure that host.docker.internal is correctly defined on Linux
       - host.docker.internal:host-gateway
-    tty: true
-    networks:
-      - my_shared_network
 
 ###> symfony/mercure-bundle ###
 ###< symfony/mercure-bundle ###
-
-networks:
-  my_shared_network:
-    external: true # for my personal use case, since I need to access another container
