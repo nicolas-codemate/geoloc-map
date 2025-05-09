@@ -50,6 +50,7 @@ readonly class MapConfigBuilder
                 longitude: $config['default_longitude'] ?? 0.
             ),
             $config['default_zoom_level'] ?? 12,
+            $config['refresh_interval'] ?? 5000, // in milliseconds
             ...$objects,
         );
     }

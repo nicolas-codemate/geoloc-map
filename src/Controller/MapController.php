@@ -100,6 +100,7 @@ class MapController extends AbstractController
         return $this->render('ux_packages/map.html.twig', [
             'map' => $map->fitBoundsToMarkers(),
             'height' => $request->get('height', 500),
+            'refreshInterval' => $mapConfig->refreshInterval,
             'hasMarkers' => $hasMarkers,
         ]);
     }

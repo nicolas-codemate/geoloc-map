@@ -18,6 +18,7 @@ class MapConfig implements MapConfigInterface
         public string $name,
         public Coordinates $defaultCoordinates,
         public int $defaultZoomLevel,
+        public int $refreshInterval,
         GeolocatableObjectInterface ...$geolocatableObjects,
     ) {
         $this->geolocatableObjects = $geolocatableObjects;
