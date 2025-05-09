@@ -17,5 +17,5 @@ interface GeolocatableObjectInterface
         get;
     }
 
-    public function fetchGeolocationData(): Coordinates;
+    public function fetchGeolocationData(): ?Coordinates;
 }

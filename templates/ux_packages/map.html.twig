@@ -6,3 +6,11 @@
         {{ ux_map(map, {style: 'height: 600px;'}) }}
     </div>
 {% endblock %}
+
+{% block addtional_js %}
+    <script>
+        setInterval(function() {
+            location.reload();
+        }, 5 * 1000);
+    </script>
+{% endblock %}
