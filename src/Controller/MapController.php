@@ -21,7 +21,7 @@ use Symfony\UX\Map\Point;
 
 class MapController extends AbstractController
 {
-    #[Route('/{name}', name: 'map')]
+    #[Route('/map/{name}', name: 'map')]
     public function __invoke(MapConfigBuilder $configBuilder, string $name, LoggerInterface $logger): Response
     {
         try {
@@ -59,9 +59,13 @@ class MapController extends AbstractController
                     'queryParams' => $geolocatableObject->queryParams,
                     'exception' => $exception,
                 ]);
-                throw $exception;
-//                throw $this->createNotFoundException();
+                throw $this->createNotFoundException();
             }
+
+            if ($coordinates === null) {
+                continue;
+            }
+
             $map
                 ->addMarker(
                     new Marker(
