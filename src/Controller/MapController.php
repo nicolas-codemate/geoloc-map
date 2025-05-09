@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Exception\InvalidCoordinateException;
+use App\Exception\InvalidCoordinatePathException;
 use App\Exception\MapConfigNotFoundException;
 use App\Service\MapConfigBuilder;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
@@ -18,11 +21,12 @@ use Symfony\UX\Map\InfoWindow;
 use Symfony\UX\Map\Map;
 use Symfony\UX\Map\Marker;
 use Symfony\UX\Map\Point;
+use Throwable;
 
 class MapController extends AbstractController
 {
     #[Route('/{name}', name: 'map')]
-    public function __invoke(MapConfigBuilder $configBuilder, string $name, LoggerInterface $logger): Response
+    public function __invoke(MapConfigBuilder $configBuilder, string $name, LoggerInterface $logger, Request $request): Response
     {
         try {
             $mapConfig = $configBuilder->buildMapConfig($name);
@@ -49,6 +53,8 @@ class MapController extends AbstractController
                     )
             );
 
+        $hasMarkers = false;
+
         foreach ($mapConfig->geolocatableObjects as $geolocatableObject) {
             try {
                 $coordinates = $geolocatableObject->fetchGeolocationData();
@@ -59,9 +65,20 @@ class MapController extends AbstractController
                     'queryParams' => $geolocatableObject->queryParams,
                     'exception' => $exception,
                 ]);
-                throw $exception;
-//                throw $this->createNotFoundException();
+                continue;
+            } catch (InvalidCoordinatePathException|InvalidCoordinateException $exception) {
+                $logger->critical($exception->getMessage());
+                continue;
+            } catch (Throwable $exception) {
+                $logger->critical(sprintf('Unexpected error: %s', $exception->getMessage()), [
+                    'url' => $geolocatableObject->url,
+                    'method' => $geolocatableObject->method,
+                    'queryParams' => $geolocatableObject->queryParams,
+                    'exception' => $exception,
+                ]);
+                continue;
             }
+
             $map
                 ->addMarker(
                     new Marker(
@@ -71,16 +88,19 @@ class MapController extends AbstractController
                         ),
                         title: $geolocatableObject->name,
                         infoWindow: new InfoWindow(
-                            content: sprintf('<p>%s</p>', $geolocatableObject->name),
+                            content: sprintf('<h2>%s</h2>', $geolocatableObject->name),
+                            opened: true,
                         )
                     )
                 );
+
+            $hasMarkers = true;
         }
 
         return $this->render('ux_packages/map.html.twig', [
-            'map' => $map
-                ->fitBoundsToMarkers()
-            ,
+            'map' => $map->fitBoundsToMarkers(),
+            'height' => $request->get('height', 500),
+            'hasMarkers' => $hasMarkers,
         ]);
     }
 }

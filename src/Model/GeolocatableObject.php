@@ -5,6 +5,8 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Exception\InvalidCoordinateException;
+use App\Exception\InvalidCoordinatePathException;
 use Symfony\Component\Clock\DatePoint;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -24,16 +26,41 @@ class GeolocatableObject implements GeolocatableObjectInterface
     public function fetchGeolocationData(): Coordinates
     {
         $response = $this->httpClient->request($this->method, $this->url, [
+            'headers' => [
+                'ngrok-skip-browser-warning' => 0, // to ease testing
+            ],
             'query' => $this->queryParams,
-            'verify_peer' => false, // not sure we should keep this. Or maybe in a configuration option
-            'verify_host' => false, // not sure we should keep this. Or maybe in a configuration option
         ]);
 
         $data = $response->toArray();
 
+        if (!isset($data[$this->latitudeJsonPath], $data[$this->longitudeJsonPath])) {
+            throw new InvalidCoordinatePathException(
+                sprintf(
+                    'Could not retrieve latitude or longitude from path (latitude: "%s", longitude : "%s"). Response data was : "%s"',
+                    $this->latitudeJsonPath,
+                    $this->longitudeJsonPath,
+                    json_encode($data)
+                )
+            );
+        }
+
+        $latitude = $data[$this->latitudeJsonPath];
+        $longitude = $data[$this->longitudeJsonPath];
+
+        if (!is_numeric($latitude) || !is_numeric($longitude)) {
+            throw new InvalidCoordinateException(
+                sprintf(
+                    'Invalid coordinate values (latitude: "%s", longitude : "%s").',
+                    $latitude,
+                    $longitude,
+                )
+            );
+        }
+
         return new Coordinates(
-            latitude: $data[$this->latitudeJsonPath],
-            longitude: $data[$this->longitudeJsonPath],
+            latitude: (float)$data[$this->latitudeJsonPath],
+            longitude: (float)$data[$this->longitudeJsonPath],
             dateTime: new DatePoint(),
         );
     }

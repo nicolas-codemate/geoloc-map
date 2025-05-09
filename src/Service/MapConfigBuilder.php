@@ -13,12 +13,12 @@ use App\Model\MapConfigInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class MapConfigBuilder
+readonly class MapConfigBuilder
 {
     public function __construct(
         #[Autowire(env: 'json:GEOLOC_OBJECTS')]
-        private readonly array $geolocatableObjects,
-        private readonly HttpClientInterface $httpClient,
+        private array $geolocatableObjects,
+        private HttpClientInterface $httpClient,
     ) {
     }
 
@@ -46,8 +46,8 @@ class MapConfigBuilder
         return new MapConfig(
             $mapName,
             new Coordinates(
-                latitude: $config['default_latitude'] ?? '0',
-                longitude: $config['default_longitude'] ?? '0'
+                latitude: $config['default_latitude'] ?? 0.,
+                longitude: $config['default_longitude'] ?? 0.
             ),
             $config['default_zoom_level'] ?? 12,
             ...$objects,
