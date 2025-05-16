@@ -1,100 +1,51 @@
-# geoloc-map
+# Symfony Docker
 
-This project provides a simple and flexible way to geolocate multiple objects based on environment variable. Each object is associated with a specific source from which its geolocation data is retrieved.
+A [Docker](https://www.docker.com/)-based installer and runtime for the [Symfony](https://symfony.com) web framework,
+with [FrankenPHP](https://frankenphp.dev) and [Caddy](https://caddyserver.com/) inside!
+
+![CI](https://github.com/dunglas/symfony-docker/workflows/CI/badge.svg)
+
+## Getting Started
+
+1. If not already done, [install Docker Compose](https://docs.docker.com/compose/install/) (v2.10+)
+2. Run `docker compose build --pull --no-cache` to build fresh images
+3. Run `docker compose up --wait` to set up and start a fresh Symfony project
+4. Open `https://localhost` in your favorite web browser and [accept the auto-generated TLS certificate](https://stackoverflow.com/a/15076602/1352334)
+5. Run `docker compose down --remove-orphans` to stop the Docker containers.
 
 ## Features
 
-- **Configurable Maps**: Define multiple maps with specific parameters (default latitude/longitude, zoom, etc.).
-- **Interactive Objects**: Each object has its own interactive map displaying its geolocation data. Data is fetched from a specified URL.
-- **Easy Integration**: The maps can be seamlessly embedded into other websites as iframes. You can also define the height of the iframe by passing `height` as a query parameter.
+* Production, development and CI ready
+* Just 1 service by default
+* Blazing-fast performance thanks to [the worker mode of FrankenPHP](https://github.com/dunglas/frankenphp/blob/main/docs/worker.md) (automatically enabled in prod mode)
+* [Installation of extra Docker Compose services](docs/extra-services.md) with Symfony Flex
+* Automatic HTTPS (in dev and prod)
+* HTTP/3 and [Early Hints](https://symfony.com/blog/new-in-symfony-6-3-early-hints) support
+* Real-time messaging thanks to a built-in [Mercure hub](https://symfony.com/doc/current/mercure.html)
+* [Vulcain](https://vulcain.rocks) support
+* Native [XDebug](docs/xdebug.md) integration
+* Super-readable configuration
 
-## Use Case
+**Enjoy!**
 
-This project is ideal for scenarios where you need to display geolocation data for multiple objects on individual maps, with the ability to integrate these maps into external web pages.
+## Docs
 
-## How It Works
+1. [Options available](docs/options.md)
+2. [Using Symfony Docker with an existing project](docs/existing-project.md)
+3. [Support for extra services](docs/extra-services.md)
+4. [Deploying in production](docs/production.md)
+5. [Debugging with Xdebug](docs/xdebug.md)
+6. [TLS Certificates](docs/tls.md)
+7. [Using MySQL instead of PostgreSQL](docs/mysql.md)
+8. [Using Alpine Linux instead of Debian](docs/alpine.md)
+9. [Using a Makefile](docs/makefile.md)
+10. [Updating the template](docs/updating.md)
+11. [Troubleshooting](docs/troubleshooting.md)
 
-Configure the objects and their respective data sources using `GEOLOC_OBJECTS` in JSON format.
+## License
 
-```json
-[
-    {
-        "mapName": "my_car",
-        "default_latitude": 48.8575,
-        "default_longitude": 2.3514,
-        "default_zoom_level": 12,
-        "refresh_interval": 5000,
-        "time_ranges": [
-            {
-                "days": [
-                    "Monday",
-                    "Tuesday",
-                    "Wednesday",
-                    "Thursday",
-                    "Friday"
-                ],
-                "start": "08:00",
-                "end": "12:00"
-            },
-            {
-                "days": [
-                    "Monday",
-                    "Tuesday",
-                    "Wednesday",
-                    "Thursday",
-                    "Friday"
-                ],
-                "start": "14:00",
-                "end": "18:00"
-            },
-            {
-                "name": [
-                    "Saturday"
-                ],
-                "start": "09:00",
-                "end": "12:00"
-            }
-        ],
-        "objects": [
-            {
-                "name": "Mon super véhicule",
-                "url": "https://my_jeedom_domain.com/core/api/jeeApi.php",
-                "query_params": {
-                    "apikey": "**JEEDOM_API_KEY**",
-                    "method": "get",
-                    "plugin": "jMQTT",
-                    "type": "cmd",
-                    "id": "[779,780]"
-                },
-                "latitude_json_path": "779",
-                "longitude_json_path": "780"
-            }
-        ]
-    }
-]
-```
+Symfony Docker is available under the MIT License.
 
-### Configuration Details:
+## Credits
 
-* `mapName`: The name of the map, which also serves as the URI of the iframe. For example, my_car will be accessible at https://mydomain.com/my_car.
-* `default_latitude`: The default latitude for the map when no object is visible.
-* `default_longitude`: The default longitude for the map when no object is visible.
-* `default_zoom_level`: The default zoom level for the map when no object is visible.
-* `refresh_interval`: The interval (in milliseconds) at which the map will refresh to fetch new geolocation data.
-* Optionnal `time_ranges`: An array of time ranges to specify when objects should be displayed.
-    * If omitted, objects will always be visible.
-    * Outside the specified time ranges, the map will display the default latitude and longitude with a generic error message indicating no geolocatable objects.
-    * Each time range includes:
-        * `days`: An array of days of the week (e.g., ["Monday", "Tuesday"]).
-        * `start`: The start time of the range (e.g., "08:00").
-        * `end`: The end time of the range (e.g., "20:00").
-* `objects`: An array of objects to display on the map:
-    * `name`: The name of the object.
-    * `url`: The URL to retrieve the geolocation data for the object.
-    * `query_params`: The query parameters to include in the request.
-    * `latitude_json_path`: The JSON path to extract the latitude from the response.
-    * `longitude_json_path`: The JSON path to extract the longitude from the response.
-
-## Upcoming Features
-
-- use [Symfony Live Component](https://symfony.com/bundles/ux-live-component/current/index.html) and [UX Map Live component](https://symfony.com/bundles/ux-map/current/index.html#usage-with-live-components) to update the map in real-time instead of using a hard refresh interval.
+Created by [Kévin Dunglas](https://dunglas.dev), co-maintained by [Maxime Helias](https://twitter.com/maxhelias) and sponsored by [Les-Tilleuls.coop](https://les-tilleuls.coop).
