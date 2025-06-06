@@ -1,3 +1,5 @@
-<div{{ attributes }}>
-    {{ ux_map(map, {style: 'height: ' ~ height ~ 'px'}) }}
+<div{{ attributes }}
+    data-poll="delay({{ refreshInterval }})|refreshMap">
+    {{ ux_map(map, {'data-controller': 'map', style: 'height: ' ~ height ~ 'px'}) }}
+    {#    <button {{ live_action('fetchGeolocationData') }}>REFRESH</button> #}
 </div>

@@ -7,6 +7,7 @@ namespace App\Twig\Components;
 
 use App\Exception\InvalidCoordinateException;
 use App\Exception\InvalidCoordinatePathException;
+use App\Exception\MapConfigNotFoundException;
 use App\Model\MapConfigInterface;
 use App\Service\MapConfigBuilder;
 use Psr\Log\LoggerInterface;
@@ -33,8 +34,9 @@ final class MapLive
     #[LiveProp]
     public ?string $mapName = null;
     #[LiveProp]
-    public ?int $height = 500;
-    public ?MapConfigInterface $config = null;
+    public int $height = 500;
+    #[LiveProp]
+    public ?int $refreshInterval = null;
 
     public function __construct(
         private readonly MapConfigBuilder $mapConfigBuilder,
@@ -45,6 +47,8 @@ final class MapLive
     protected function instantiateMap(): Map
     {
         $mapConfig = $this->mapConfigBuilder->buildMapConfig($this->mapName);
+
+        $this->refreshInterval = $mapConfig->refreshInterval;
 
         $map = new Map('default')
             ->center(
@@ -72,16 +76,22 @@ final class MapLive
             return $map->fitBoundsToMarkers();
         }
 
-        $this->config = $mapConfig;
+        $this->fetchGeolocationData($mapConfig);
 
         return $map;
     }
 
-
     #[LiveAction]
-    public function fetchGeolocationData(): void
+    public function refreshMap(): void
     {
-        foreach ($this->config->geolocatableObjects as $geolocatableObject) {
+        $mapConfig = $this->mapConfigBuilder->buildMapConfig($this->mapName);
+
+        $this->fetchGeolocationData($mapConfig);
+    }
+
+    private function fetchGeolocationData(MapConfigInterface $mapConfig): void
+    {
+        foreach ($mapConfig->geolocatableObjects as $geolocatableObject) {
             try {
                 $coordinates = $geolocatableObject->fetchGeolocationData();
             } catch (HttpExceptionInterface|TransportExceptionInterface $exception) {
@@ -110,6 +120,7 @@ final class MapLive
             }
 
             $this->getMap()
+                ->removeMarker($geolocatableObject->name)
                 ->addMarker(
                     new Marker(
                         position: new Point(
@@ -120,9 +131,12 @@ final class MapLive
                         infoWindow: new InfoWindow(
                             content: sprintf('<h2>%s</h2>', $geolocatableObject->name),
                             opened: true,
-                        )
+                        ),
+                        id: $geolocatableObject->name
                     )
                 );
         }
+
+        $this->getMap()->fitBoundsToMarkers();
     }
 }
