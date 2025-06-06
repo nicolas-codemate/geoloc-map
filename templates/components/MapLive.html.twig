@@ -1,5 +1,60 @@
 <div{{ attributes }}
-    data-poll="delay({{ refreshInterval }})|refreshMap">
-    {{ ux_map(map, {'data-controller': 'map', style: 'height: ' ~ height ~ 'px'}) }}
-    {#    <button {{ live_action('fetchGeolocationData') }}>REFRESH</button> #}
+    data-poll="delay({{ refreshInterval }})|refreshMap"
+>
+    <style>
+        .map-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: {{ height }}px;
+            backdrop-filter: blur(5px);
+            transition: backdrop-filter 0.5s ease;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .map-overlay.deblur {
+            backdrop-filter: blur(0px);
+            transition: backdrop-filter 0.5s ease, z-index 0s 0.5s;
+            z-index: 0;
+        }
+
+        .overlay-text {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            font-weight: bold;
+            animation: fadeIn 1s forwards;
+        }
+
+        .text-animation {
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+    </style>
+    <div style="position: relative;">
+        {{ ux_map(map, { style: 'height: ' ~ height ~ 'px;z-index:10'}) }}
+
+        <div class="map-overlay {{ false == isLoading and hasMarkers ? 'deblur' : '' }}">
+            {% if isLoading %}
+                <div class="overlay-text">Chargement en cours...</div>
+            {% endif %}
+
+            {% if false == hasMarkers %}
+                <div class="overlay-text">Aucune donnée de géolocalisation</div>
+            {% endif %}
+        </div>
+    </div>
 </div>

@@ -7,7 +7,6 @@ namespace App\Twig\Components;
 
 use App\Exception\InvalidCoordinateException;
 use App\Exception\InvalidCoordinatePathException;
-use App\Exception\MapConfigNotFoundException;
 use App\Model\MapConfigInterface;
 use App\Service\MapConfigBuilder;
 use Psr\Log\LoggerInterface;
@@ -37,6 +36,10 @@ final class MapLive
     public int $height = 500;
     #[LiveProp]
     public ?int $refreshInterval = null;
+    #[LiveProp]
+    public bool $hasMarkers = true;
+    #[LiveProp]
+    public bool $isLoading = true;
 
     public function __construct(
         private readonly MapConfigBuilder $mapConfigBuilder,
@@ -69,14 +72,9 @@ final class MapLive
                     )
             );
 
-        // out of time ranges, act like there are no markers
-        if (false === $mapConfig->timeRangeContainer->isCurrentTimeInRanges()) {
-            $this->logger->info(sprintf('Out of time ranges: %s', $mapConfig->timeRangeContainer));
+        $this->fetchGeolocationData($map, $mapConfig);
 
-            return $map->fitBoundsToMarkers();
-        }
-
-        $this->fetchGeolocationData($mapConfig);
+        $this->isLoading = false;
 
         return $map;
     }
@@ -86,11 +84,19 @@ final class MapLive
     {
         $mapConfig = $this->mapConfigBuilder->buildMapConfig($this->mapName);
 
-        $this->fetchGeolocationData($mapConfig);
+        $this->fetchGeolocationData($this->getMap(), $mapConfig);
     }
 
-    private function fetchGeolocationData(MapConfigInterface $mapConfig): void
+    private function fetchGeolocationData(Map $map, MapConfigInterface $mapConfig): void
     {
+        if (false === $mapConfig->timeRangeContainer->isCurrentTimeInRanges()) {
+            $this->hasMarkers = false;
+            $this->logger->info(sprintf('Out of time ranges: %s', $mapConfig->timeRangeContainer));
+
+            return;
+        }
+
+        $locatedObjectsCount = 0;
         foreach ($mapConfig->geolocatableObjects as $geolocatableObject) {
             try {
                 $coordinates = $geolocatableObject->fetchGeolocationData();
@@ -119,7 +125,7 @@ final class MapLive
                 return;
             }
 
-            $this->getMap()
+            $map
                 ->removeMarker($geolocatableObject->name)
                 ->addMarker(
                     new Marker(
@@ -135,8 +141,28 @@ final class MapLive
                         id: $geolocatableObject->name
                     )
                 );
+            ++$locatedObjectsCount;
         }
 
-        $this->getMap()->fitBoundsToMarkers();
+        $this->hasMarkers = $locatedObjectsCount > 0;
+
+        if (!$this->hasMarkers) {
+            return;
+        }
+
+        if (1 === $locatedObjectsCount && isset($coordinates)) {
+            $map->center(
+                new Point(
+                    latitude: $coordinates->latitude,
+                    longitude: $coordinates->longitude,
+                )
+            );
+
+            return;
+        }
+
+        $map
+            ->fitBoundsToMarkers()
+        ;
     }
 }
