@@ -23,7 +23,7 @@ class GeolocatableObject implements GeolocatableObjectInterface
     ) {
     }
 
-    public function fetchGeolocationData(): Coordinates
+    public function fetchGeolocationData(): ?Coordinates
     {
         $response = $this->httpClient->request($this->method, $this->url, [
             'headers' => [

@@ -110,6 +110,3 @@ docker run -e SERVER_NAME=:8080 -e HTTP_PORT=8080 -p 8080:8080 geoloc-map:latest
     * `latitude_json_path`: The JSON path to extract the latitude from the response.
     * `longitude_json_path`: The JSON path to extract the longitude from the response.
 
-## Upcoming Features
-
-- use [Symfony Live Component](https://symfony.com/bundles/ux-live-component/current/index.html) and [UX Map Live component](https://symfony.com/bundles/ux-map/current/index.html#usage-with-live-components) to update the map in real-time instead of using a hard refresh interval.

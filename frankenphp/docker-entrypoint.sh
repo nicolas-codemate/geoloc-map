@@ -57,7 +57,9 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 		fi
 	fi
 
-	php bin/console asset-map:compile
+	if [ "$APP_ENV" = "prod" ]; then
+		php bin/console asset-map:compile
+	fi
 
 	if [ "${DISABLE_SETFACL:-0}" != "1" ]; then
 		setfacl -R -m u:www-data:rwX -m u:"$(whoami)":rwX var
