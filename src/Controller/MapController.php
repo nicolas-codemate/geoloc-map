@@ -19,7 +19,7 @@ class MapController extends AbstractController
     public function __invoke(MapConfigBuilder $configBuilder, string $mapName, LoggerInterface $logger, Request $request): Response
     {
         try {
-            return $this->render('test.html.twig', [
+            return $this->render('map.html.twig', [
                 'mapName' => $mapName,
                 'height' => $request->get('height', 800),
             ]);
