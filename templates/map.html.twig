@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}{{ mapName }}{% endblock %}
+
 {% block body %}
    <div>
        {{ component('MapLive', {'mapName': mapName}) }}

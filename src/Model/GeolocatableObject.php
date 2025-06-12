@@ -19,7 +19,8 @@ class GeolocatableObject implements GeolocatableObjectInterface
         public array $queryParams,
         public string $latitudeJsonPath,
         public string $longitudeJsonPath,
-        public HttpClientInterface $httpClient
+        public HttpClientInterface $httpClient,
+        public bool $sandbox,
     ) {
     }
 
@@ -61,6 +62,27 @@ class GeolocatableObject implements GeolocatableObjectInterface
         return new Coordinates(
             latitude: (float)$data[$this->latitudeJsonPath],
             longitude: (float)$data[$this->longitudeJsonPath],
+            dateTime: new DatePoint(),
+        );
+    }
+
+    public function mockCoordinate(Coordinates $baseCoordinates): Coordinates
+    {
+        // apply some tiny variation
+        $variationFactor = 10_000;
+        if (random_int(1, 5) === 5) {
+            $variationFactor = 1_000; // once over 5 apply bigger variation
+        }
+
+        $deltaLatitude = (random_int(1, 9) / $variationFactor) * (random_int(0, 1) ? 1 : -1);
+        $deltaLongitude = (random_int(1, 9) / $variationFactor) * (random_int(0, 1) ? 1 : -1);
+
+        $newLatitude = $baseCoordinates->latitude + $deltaLatitude;
+        $newLongitude = $baseCoordinates->longitude + $deltaLongitude;
+
+        return new Coordinates(
+            latitude: $newLatitude,
+            longitude: $newLongitude,
             dateTime: new DatePoint(),
         );
     }

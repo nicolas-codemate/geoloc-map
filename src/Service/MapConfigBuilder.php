@@ -42,6 +42,7 @@ readonly class MapConfigBuilder
                 latitudeJsonPath: $object['latitude_json_path'] ?? '',
                 longitudeJsonPath: $object['longitude_json_path'] ?? '',
                 httpClient: $this->httpClient,
+                sandbox: isset($object['enable_sandbox']) && $object['enable_sandbox']
             );
         }
 

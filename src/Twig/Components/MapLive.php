@@ -7,6 +7,8 @@ namespace App\Twig\Components;
 
 use App\Exception\InvalidCoordinateException;
 use App\Exception\InvalidCoordinatePathException;
+use App\Model\Coordinates;
+use App\Model\GeolocatableObjectInterface;
 use App\Model\MapConfigInterface;
 use App\Service\MapConfigBuilder;
 use Psr\Log\LoggerInterface;
@@ -98,31 +100,9 @@ final class MapLive
 
         $locatedObjectsCount = 0;
         foreach ($mapConfig->geolocatableObjects as $geolocatableObject) {
-            try {
-                $coordinates = $geolocatableObject->fetchGeolocationData();
-            } catch (HttpExceptionInterface|TransportExceptionInterface $exception) {
-                $this->logger->critical(sprintf('Error fetching geolocation data: %s', $exception->getMessage()), [
-                    'url' => $geolocatableObject->url,
-                    'method' => $geolocatableObject->method,
-                    'queryParams' => $geolocatableObject->queryParams,
-                    'exception' => $exception,
-                ]);
-                continue;
-            } catch (InvalidCoordinatePathException|InvalidCoordinateException $exception) {
-                $this->logger->critical($exception->getMessage());
-                continue;
-            } catch (\Throwable $exception) {
-                $this->logger->critical(sprintf('Unexpected error: %s', $exception->getMessage()), [
-                    'url' => $geolocatableObject->url,
-                    'method' => $geolocatableObject->method,
-                    'queryParams' => $geolocatableObject->queryParams,
-                    'exception' => $exception,
-                ]);
-                continue;
-            }
-
+            $coordinates = $this->getObjectCoordinates($geolocatableObject, $mapConfig->defaultCoordinates);
             if (null === $coordinates) {
-                return;
+                continue;
             }
 
             $map
@@ -162,7 +142,41 @@ final class MapLive
         }
 
         $map
-            ->fitBoundsToMarkers()
-        ;
+            ->fitBoundsToMarkers();
+    }
+
+    private function getObjectCoordinates(GeolocatableObjectInterface $geolocatableObject, Coordinates $defaultCoordinates): ?Coordinates
+    {
+        if ($geolocatableObject->sandbox) {
+            return $geolocatableObject->mockCoordinate($defaultCoordinates);
+        }
+
+        try {
+            $coordinates = $geolocatableObject->fetchGeolocationData();
+        } catch (HttpExceptionInterface|TransportExceptionInterface $exception) {
+            $this->logger->critical(sprintf('Error fetching geolocation data: %s', $exception->getMessage()), [
+                'url' => $geolocatableObject->url,
+                'method' => $geolocatableObject->method,
+                'queryParams' => $geolocatableObject->queryParams,
+                'exception' => $exception,
+            ]);
+
+            return null;
+        } catch (InvalidCoordinatePathException|InvalidCoordinateException $exception) {
+            $this->logger->critical($exception->getMessage());
+
+            return null;
+        } catch (\Throwable $exception) {
+            $this->logger->critical(sprintf('Unexpected error: %s', $exception->getMessage()), [
+                'url' => $geolocatableObject->url,
+                'method' => $geolocatableObject->method,
+                'queryParams' => $geolocatableObject->queryParams,
+                'exception' => $exception,
+            ]);
+
+            return null;
+        }
+
+        return $coordinates;
     }
 }

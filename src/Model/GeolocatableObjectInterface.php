@@ -17,5 +17,11 @@ interface GeolocatableObjectInterface
         get;
     }
 
+    public bool $sandbox {
+        get;
+    }
+
     public function fetchGeolocationData(): ?Coordinates;
+
+    public function mockCoordinate(Coordinates $baseCoordinates): Coordinates;
 }
