@@ -7,6 +7,7 @@ This project provides a simple and flexible way to geolocate multiple objects ba
 - **Configurable Maps**: Define multiple maps with specific parameters (default latitude/longitude, zoom, etc.).
 - **Interactive Objects**: Each object has its own interactive map displaying its geolocation data. Data is fetched from a specified URL.
 - **Easy Integration**: The maps can be seamlessly embedded into other websites as iframes. You can also define the height of the iframe by passing `height` as a query parameter.
+- **Sandbox mode**: Mock some random coordinate to test the module
 
 ## Use Case
 
@@ -109,4 +110,5 @@ docker run -e SERVER_NAME=:8080 -e HTTP_PORT=8080 -p 8080:8080 geoloc-map:latest
     * `query_params`: The query parameters to include in the request.
     * `latitude_json_path`: The JSON path to extract the latitude from the response.
     * `longitude_json_path`: The JSON path to extract the longitude from the response.
+    * `enable_sandbox`: set to true and omit all other param except name to enable a sandbox mode. It will generate some random coordinate.
 

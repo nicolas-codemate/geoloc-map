@@ -23,6 +23,7 @@ class MapController extends AbstractController
                 'mapName' => $mapName,
                 'height' => $request->get('height', 800),
             ]);
+
         } catch (RuntimeError $exception) {
             if ($exception->getPrevious() instanceof MapConfigNotFoundException) {
                 $logger->info(sprintf('Map config "%s" not found.', $mapName));

@@ -23,5 +23,5 @@ interface GeolocatableObjectInterface
 
     public function fetchGeolocationData(): ?Coordinates;
 
-    public function mockCoordinate(Coordinates $baseCoordinates): Coordinates;
+    public function mockCoordinates(Coordinates $baseCoordinates): Coordinates;
 }

@@ -63,6 +63,7 @@ final class MapLive
                 )
             )
             ->zoom($mapConfig->defaultZoomLevel)
+            ->fitBoundsToMarkers(false) // will handle this manually in javascript. See assets/controllers/map_controller.js
             ->options(
                 new LeafletOptions()
                     ->tileLayer(
@@ -115,7 +116,7 @@ final class MapLive
                         ),
                         title: $geolocatableObject->name,
                         infoWindow: new InfoWindow(
-                            content: sprintf('<h2>%s</h2>', $geolocatableObject->name),
+                            content: sprintf('<h4>%s</h4>', $geolocatableObject->name),
                             opened: true,
                         ),
                         id: $geolocatableObject->name
@@ -130,25 +131,20 @@ final class MapLive
             return;
         }
 
-        if (1 === $locatedObjectsCount && isset($coordinates)) {
-            $map->center(
-                new Point(
-                    latitude: $coordinates->latitude,
-                    longitude: $coordinates->longitude,
-                )
-            );
-
-            return;
-        }
-
-        $map
-            ->fitBoundsToMarkers();
+//        if (1 === $locatedObjectsCount && isset($coordinates)) {
+//            $map->center(
+//                new Point(
+//                    latitude: $coordinates->latitude + 0.0005, // small offset to avoid zooming in too much
+//                    longitude: $coordinates->longitude - 0.0005, // small offset to avoid zooming in too much
+//                )
+//            );
+//        }
     }
 
     private function getObjectCoordinates(GeolocatableObjectInterface $geolocatableObject, Coordinates $defaultCoordinates): ?Coordinates
     {
         if ($geolocatableObject->sandbox) {
-            return $geolocatableObject->mockCoordinate($defaultCoordinates);
+            return $geolocatableObject->mockCoordinates($defaultCoordinates);
         }
 
         try {

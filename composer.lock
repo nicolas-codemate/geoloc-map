@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2b9771020e7b8589febb87e42c9821c2",
+    "content-hash": "be9068c6d4608ad6844abded3f0d7e4a",
     "packages": [
         {
             "name": "composer/semver",
@@ -3112,16 +3112,16 @@
         },
         {
             "name": "symfony/stimulus-bundle",
-            "version": "v2.26.0",
+            "version": "v2.26.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/stimulus-bundle.git",
-                "reference": "750c770f66b45b40135eb32d753dbd7d84182c92"
+                "reference": "82c174ebe564e6ecc1412974b6380b86d450675f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/stimulus-bundle/zipball/750c770f66b45b40135eb32d753dbd7d84182c92",
-                "reference": "750c770f66b45b40135eb32d753dbd7d84182c92",
+                "url": "https://api.github.com/repos/symfony/stimulus-bundle/zipball/82c174ebe564e6ecc1412974b6380b86d450675f",
+                "reference": "82c174ebe564e6ecc1412974b6380b86d450675f",
                 "shasum": ""
             },
             "require": {
@@ -3161,7 +3161,7 @@
                 "symfony-ux"
             ],
             "support": {
-                "source": "https://github.com/symfony/stimulus-bundle/tree/v2.26.0"
+                "source": "https://github.com/symfony/stimulus-bundle/tree/v2.26.1"
             },
             "funding": [
                 {
@@ -3177,7 +3177,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-05-23T09:27:30+00:00"
+            "time": "2025-06-05T17:25:17+00:00"
         },
         {
             "name": "symfony/string",
@@ -3620,16 +3620,16 @@
         },
         {
             "name": "symfony/ux-leaflet-map",
-            "version": "v2.26.0",
+            "version": "v2.26.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/ux-leaflet-map.git",
-                "reference": "3b2c65813f2dadb27a3962faf68b8b00e07fb7c9"
+                "reference": "1dd25d65b8d63ff6d14f92be1d0674259cb6c89e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/ux-leaflet-map/zipball/3b2c65813f2dadb27a3962faf68b8b00e07fb7c9",
-                "reference": "3b2c65813f2dadb27a3962faf68b8b00e07fb7c9",
+                "url": "https://api.github.com/repos/symfony/ux-leaflet-map/zipball/1dd25d65b8d63ff6d14f92be1d0674259cb6c89e",
+                "reference": "1dd25d65b8d63ff6d14f92be1d0674259cb6c89e",
                 "shasum": ""
             },
             "require": {
@@ -3672,7 +3672,7 @@
                 "symfony-ux"
             ],
             "support": {
-                "source": "https://github.com/symfony/ux-leaflet-map/tree/v2.26.0"
+                "source": "https://github.com/symfony/ux-leaflet-map/tree/v2.26.1"
             },
             "funding": [
                 {
@@ -3688,20 +3688,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-05-28T19:24:06+00:00"
+            "time": "2025-06-05T17:25:17+00:00"
         },
         {
             "name": "symfony/ux-live-component",
-            "version": "v2.26.0",
+            "version": "v2.26.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/ux-live-component.git",
-                "reference": "fe860a47f164c4ead89b9cb5cf7d3a13835de0a3"
+                "reference": "92b300bb90d87f14aeae47b0f5c9e058b15f5c2f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/ux-live-component/zipball/fe860a47f164c4ead89b9cb5cf7d3a13835de0a3",
-                "reference": "fe860a47f164c4ead89b9cb5cf7d3a13835de0a3",
+                "url": "https://api.github.com/repos/symfony/ux-live-component/zipball/92b300bb90d87f14aeae47b0f5c9e058b15f5c2f",
+                "reference": "92b300bb90d87f14aeae47b0f5c9e058b15f5c2f",
                 "shasum": ""
             },
             "require": {
@@ -3716,7 +3716,7 @@
             "conflict": {
                 "symfony/config": "<5.4.0",
                 "symfony/property-info": "~7.0.0",
-                "symfony/type-info": "<7.1"
+                "symfony/type-info": "<7.2"
             },
             "require-dev": {
                 "doctrine/annotations": "^1.0",
@@ -3769,7 +3769,7 @@
                 "twig"
             ],
             "support": {
-                "source": "https://github.com/symfony/ux-live-component/tree/v2.26.0"
+                "source": "https://github.com/symfony/ux-live-component/tree/v2.26.1"
             },
             "funding": [
                 {
@@ -3785,20 +3785,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-05-31T15:09:39+00:00"
+            "time": "2025-06-06T19:57:53+00:00"
         },
         {
             "name": "symfony/ux-map",
-            "version": "v2.26.0",
+            "version": "v2.26.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/ux-map.git",
-                "reference": "a03665d6e4016a4c0b95e5033ba3fdcdc2137dce"
+                "reference": "6064968cfb9cd3b4a133b3d83b87ad570a036b16"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/ux-map/zipball/a03665d6e4016a4c0b95e5033ba3fdcdc2137dce",
-                "reference": "a03665d6e4016a4c0b95e5033ba3fdcdc2137dce",
+                "url": "https://api.github.com/repos/symfony/ux-map/zipball/6064968cfb9cd3b4a133b3d83b87ad570a036b16",
+                "reference": "6064968cfb9cd3b4a133b3d83b87ad570a036b16",
                 "shasum": ""
             },
             "require": {
@@ -3854,7 +3854,7 @@
                 "symfony-ux"
             ],
             "support": {
-                "source": "https://github.com/symfony/ux-map/tree/v2.26.0"
+                "source": "https://github.com/symfony/ux-map/tree/v2.26.1"
             },
             "funding": [
                 {
@@ -3870,20 +3870,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-05-31T15:09:39+00:00"
+            "time": "2025-06-05T17:25:17+00:00"
         },
         {
             "name": "symfony/ux-turbo",
-            "version": "v2.26.0",
+            "version": "v2.26.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/ux-turbo.git",
-                "reference": "12d9989fb945f2074b41aad4915fc593ecd4ed00"
+                "reference": "3754ac2b41220127e58c62f7599eaf7834b69a55"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/ux-turbo/zipball/12d9989fb945f2074b41aad4915fc593ecd4ed00",
-                "reference": "12d9989fb945f2074b41aad4915fc593ecd4ed00",
+                "url": "https://api.github.com/repos/symfony/ux-turbo/zipball/3754ac2b41220127e58c62f7599eaf7834b69a55",
+                "reference": "3754ac2b41220127e58c62f7599eaf7834b69a55",
                 "shasum": ""
             },
             "require": {
@@ -3953,7 +3953,7 @@
                 "turbo-stream"
             ],
             "support": {
-                "source": "https://github.com/symfony/ux-turbo/tree/v2.26.0"
+                "source": "https://github.com/symfony/ux-turbo/tree/v2.26.1"
             },
             "funding": [
                 {
@@ -3969,7 +3969,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-05-26T20:34:50+00:00"
+            "time": "2025-06-05T17:25:17+00:00"
         },
         {
             "name": "symfony/ux-twig-component",

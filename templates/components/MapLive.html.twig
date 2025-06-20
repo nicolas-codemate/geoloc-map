@@ -45,7 +45,7 @@
 
     </style>
     <div style="position: relative;">
-        {{ ux_map(map, { style: 'height: ' ~ height ~ 'px;z-index:10'}) }}
+        {{ ux_map(map, {'data-controller': 'map', style: 'height: ' ~ height ~ 'px;z-index:10'}) }}
 
         <div class="map-overlay {{ false == isLoading and hasMarkers ? 'deblur' : '' }}">
             {% if isLoading %}
