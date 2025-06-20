@@ -16,6 +16,49 @@ const getMarkersFromMap = (map) => {
   return markers;
 }
 
+const centerMapOnMarkers = (map, L, newMarker) => {
+  const markers = getMarkersFromMap(map);
+
+  if (markers.length && map) {
+    const bounds = L.latLngBounds();
+
+    // Add all markers to bounds
+    markers.forEach(marker => {
+      bounds.extend(marker.getLatLng());
+    });
+
+    if (bounds.isValid()) {
+      if (markers.length === 1) {
+
+        const currentBounds = map.getBounds();
+
+        if (newMarker) {
+          // Check if the new marker is already in the current view
+          const newMarkerPosition = newMarker.getLatLng();
+          const isMarkerInView = currentBounds.contains(newMarkerPosition);
+
+          if (isMarkerInView) {
+            return; // Don't move the map if marker is already visible
+          }
+        }
+
+        map.flyToBounds(bounds, {
+          padding: [50, 50],
+          duration: 0.5,
+          maxZoom: map._zoom,
+          animate: true,
+        });
+      } else {
+        map.fitBounds(bounds, {
+          padding: [50, 50],
+          maxZoom: map._zoom,
+          animate: true,
+        });
+      }
+    }
+  }
+}
+
 export default class extends Controller {
 
   // define the properties you want to use
@@ -64,6 +107,8 @@ export default class extends Controller {
   _onConnect(event) {
     this.map = event.detail.map;
     this.L = event.detail.L;
+
+    centerMapOnMarkers(this.map, this.L);
   }
 
   /**
@@ -89,26 +134,7 @@ export default class extends Controller {
       return;
     }
 
-    const markers = getMarkersFromMap(this.map);
-
-    if (markers.length && this.map) {
-      const bounds = this.L.latLngBounds();
-
-      // Add all markers to bounds
-      markers.forEach(marker => {
-        bounds.extend(marker.getLatLng());
-      });
-
-      if (bounds.isValid()) {
-        // For multiple markers, use fitBounds
-        this.map.flyToBounds(bounds, {
-          padding: [50, 50],
-          duration: 0.5, // Adjust duration as needed
-          maxZoom: this.map._zoom, // keep the current zoom level
-          animate: true,
-        });
-      }
-    }
+    centerMapOnMarkers(this.map, this.L, event.detail.marker);
   }
 
   /**

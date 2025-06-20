@@ -11,6 +11,7 @@ use App\Model\Coordinates;
 use App\Model\GeolocatableObjectInterface;
 use App\Model\MapConfigInterface;
 use App\Service\MapConfigBuilder;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -46,6 +47,7 @@ final class MapLive
     public function __construct(
         private readonly MapConfigBuilder $mapConfigBuilder,
         private readonly LoggerInterface $logger,
+        private readonly CacheItemPoolInterface $geolocatedObjectsCache,
     ) {
     }
 
@@ -101,7 +103,7 @@ final class MapLive
 
         $locatedObjectsCount = 0;
         foreach ($mapConfig->geolocatableObjects as $geolocatableObject) {
-            $coordinates = $this->getObjectCoordinates($geolocatableObject, $mapConfig->defaultCoordinates);
+            $coordinates = $this->getObjectCoordinates($geolocatableObject, $mapConfig);
             if (null === $coordinates) {
                 continue;
             }
@@ -126,25 +128,34 @@ final class MapLive
         }
 
         $this->hasMarkers = $locatedObjectsCount > 0;
-
-        if (!$this->hasMarkers) {
-            return;
-        }
-
-//        if (1 === $locatedObjectsCount && isset($coordinates)) {
-//            $map->center(
-//                new Point(
-//                    latitude: $coordinates->latitude + 0.0005, // small offset to avoid zooming in too much
-//                    longitude: $coordinates->longitude - 0.0005, // small offset to avoid zooming in too much
-//                )
-//            );
-//        }
     }
 
-    private function getObjectCoordinates(GeolocatableObjectInterface $geolocatableObject, Coordinates $defaultCoordinates): ?Coordinates
+    private function getObjectCoordinates(GeolocatableObjectInterface $geolocatableObject, MapConfigInterface $mapConfig): ?Coordinates
     {
         if ($geolocatableObject->sandbox) {
-            return $geolocatableObject->mockCoordinates($defaultCoordinates);
+            // if the object is sandboxed, we mock the coordinates base either on the default coordinates or on the previously cached coordinates
+            $baseMockCoordinates = $mapConfig->defaultCoordinates;
+
+            // check if the object is already cached
+            $cachedItem = $this->geolocatedObjectsCache->getItem($geolocatableObject->name);
+            if ($cachedItem->isHit()) {
+                // if cached, use the cached coordinates as base for mocking
+                $baseMockCoordinates = $cachedItem->get();
+            }
+
+            $coordinates = $geolocatableObject->mockCoordinates($baseMockCoordinates);
+            $cachedItem->set($coordinates);
+            $cachedItem->expiresAfter(3600); // cache for 1 hour for sandboxed objects
+            $this->geolocatedObjectsCache->save($cachedItem);
+
+            return $coordinates;
+        }
+
+        // check if the object is already cached. If it is, we return the cached coordinates, no need to fetch, to reduce load on the API. Cache is shared across all instances.
+        $cachedItem = $this->geolocatedObjectsCache->getItem($geolocatableObject->name);
+        if ($cachedItem->isHit()) {
+            // if cached, return the cached coordinates
+            return $cachedItem->get();
         }
 
         try {
@@ -172,6 +183,12 @@ final class MapLive
 
             return null;
         }
+
+        $this->geolocatedObjectsCache->save(
+            $cachedItem
+                ->set($coordinates)
+                ->expiresAfter($mapConfig->refreshInterval / 1000)
+        );
 
         return $coordinates;
     }

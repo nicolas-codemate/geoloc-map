@@ -20,6 +20,10 @@ interface MapConfigInterface
         get;
     }
 
+    public int $refreshInterval {
+        get;
+    }
+
     /**
      * @var GeolocatableObjectInterface[]
      */

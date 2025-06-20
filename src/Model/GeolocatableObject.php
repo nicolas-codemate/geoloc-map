@@ -69,7 +69,7 @@ class GeolocatableObject implements GeolocatableObjectInterface
     public function mockCoordinates(Coordinates $baseCoordinates): Coordinates
     {
         // introduce a small random variation, but occasionally use a larger one
-        $variationFactor = random_int(1, 5) === 5 ? 1_000 : 10_000;
+        $variationFactor = random_int(1, 10) === 10 ? 5_000 : 30_000;
 
         $deltaLatitude = (random_int(1, 9) / $variationFactor) * (random_int(0, 1) ? 1 : -1);
         $deltaLongitude = (random_int(1, 9) / $variationFactor) * (random_int(0, 1) ? 1 : -1);

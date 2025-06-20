@@ -15,5 +15,7 @@ framework:
         #app: cache.adapter.apcu
 
         # Namespaced pools use the above "app" backend by default
-        #pools:
-            #my.dedicated.cache: null
+        pools:
+            geolocated_objects:
+                adapter: cache.adapter.apcu
+                default_lifetime: 60
