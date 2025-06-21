@@ -25,12 +25,16 @@ const centerMapOnMarkers = (map, L, newMarker) => {
     // Add all markers to bounds
     markers.forEach(marker => {
       bounds.extend(marker.getLatLng());
+      // force open popup if it exists
+      if (marker.getPopup()) {
+        marker.openPopup();
+      }
     });
 
     if (bounds.isValid()) {
       if (markers.length === 1) {
 
-        const currentBounds = map.getBounds();
+        const currentBounds = map.getBounds().pad(0.05);
 
         if (newMarker) {
           // Check if the new marker is already in the current view
@@ -71,7 +75,7 @@ export default class extends Controller {
     // this.element.addEventListener('ux:map:marker:before-create', this._onMarkerBeforeCreate);
     this.element.addEventListener('ux:map:marker:after-create', this._onMarkerAfterCreate);
     // this.element.addEventListener('ux:map:info-window:before-create', this._onInfoWindowBeforeCreate);
-    // this.element.addEventListener('ux:map:info-window:after-create', this._onInfoWindowAfterCreate);
+    this.element.addEventListener('ux:map:info-window:after-create', this._onInfoWindowAfterCreate);
     // this.element.addEventListener('ux:map:polygon:before-create', this._onPolygonBeforeCreate);
     // this.element.addEventListener('ux:map:polygon:after-create', this._onPolygonAfterCreate);
     // this.element.addEventListener('ux:map:polyline:before-create', this._onPolylineBeforeCreate);
@@ -85,7 +89,7 @@ export default class extends Controller {
     // this.element.removeEventListener('ux:map:marker:before-create', this._onMarkerBeforeCreate);
     this.element.removeEventListener('ux:map:marker:after-create', this._onMarkerAfterCreate);
     // this.element.removeEventListener('ux:map:info-window:before-create', this._onInfoWindowBeforeCreate);
-    // this.element.removeEventListener('ux:map:info-window:after-create', this._onInfoWindowAfterCreate);
+    this.element.removeEventListener('ux:map:info-window:after-create', this._onInfoWindowAfterCreate);
     // this.element.removeEventListener('ux:map:polygon:before-create', this._onPolygonBeforeCreate);
     // this.element.removeEventListener('ux:map:polygon:after-create', this._onPolygonAfterCreate);
     // this.element.removeEventListener('ux:map:polyline:before-create', this._onPolylineBeforeCreate);
@@ -151,15 +155,13 @@ export default class extends Controller {
    * You can access the created info window instance, which depends on the renderer you are using.
    */
   _onInfoWindowAfterCreate(event) {
-    // The info window instance
-    // console.log(event.detail.infoWindow);
+    const popup = event.detail.infoWindow;
+    // Set options to prevent auto-closing
+    if (popup) {
+      popup.options.autoClose = false;
+      popup.options.closeOnClick = false;
+    }
 
-    // The associated element instance is also available, e.g. a marker...
-    // console.log(event.detail.marker);
-    // ... or a polygon
-    // console.log(event.detail.polygon);
-    // ... or a polyline
-    // console.log(event.detail.polyline);
   }
 
   /**

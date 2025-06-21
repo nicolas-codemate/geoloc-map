@@ -119,7 +119,7 @@ final class MapLive
                         title: $geolocatableObject->name,
                         infoWindow: new InfoWindow(
                             content: sprintf('<h4>%s</h4>', $geolocatableObject->name),
-                            opened: true,
+                            opened: false, // manage opening in javascript
                         ),
                         id: $geolocatableObject->name
                     )
