@@ -27,7 +27,7 @@ const centerMapOnMarkers = (map, L, newMarker) => {
       bounds.extend(marker.getLatLng());
       // force open popup if it exists
       if (marker.getPopup()) {
-        marker.openPopup();
+        setTimeout(() => marker.openPopup(), 0); // simulate a next tick to ensure the popup opens after the map is centered
       }
     });
 
