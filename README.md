@@ -112,3 +112,110 @@ docker run -e SERVER_NAME=:8080 -e HTTP_PORT=8080 -p 8080:8080 geoloc-map:latest
     * `longitude_json_path`: The JSON path to extract the longitude from the response.
     * `enable_sandbox`: set to true and omit all other param except name to enable a sandbox mode. It will generate some random coordinate.
 
+## Installation
+
+On Linux, the following CLI commands are based on a recent Ubuntu release. Please adjust them as needed for your specific distribution.
+
+### Prerequisites
+- A Linux server (Ubuntu 20.04 or later is recommended)
+- A user with sudo privileges
+- Docker and Docker Compose installed
+- Git installed
+
+Follow the steps below to install the necessary dependencies, or skip to the [Start the Application](#Start-the-Application) section if you already have them installed.
+
+1. Update the package manager
+
+```bash
+sudo apt update
+```
+2. Install GIT
+
+```bash
+sudo apt install git
+```
+3. Clone the repository in wanted directory
+
+```bash
+git clone https://github.com/nicolas-codemate/geoloc-map.git
+```
+
+4. [Install Docker and Docker Compose](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
+
+```bash
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+```
+
+Install Docker Engine, CLI, and Containerd:
+
+```bash
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+5. Allow your user to run Docker commands without sudo
+
+```bash
+sudo groupadd docker
+sudo usermod -aG docker $USER
+```
+
+6. Log out and log back in to apply the group changes.
+
+You can verify everything is working by running:
+
+```bash
+docker run hello-world
+```
+
+### Start the Application
+
+1. Navigate to the cloned repository directory:
+
+```bash
+cd geoloc-map
+```
+
+2. Build the Docker images:
+
+```bash
+docker compose -f compose.yaml -f compose.prod.yaml build --pull --no-cache
+```
+
+3. Create a `.env.prod.local` file in the root of your project with the following content:
+```env
+APP_SECRET=AnyRandomStringToSecureYourApp
+GEOLOC_OBJECTS='[...]' # Replace with your actual JSON configuration
+```
+
+4. Start the application:
+
+```bash
+SERVER_NAME=your-domain-name.example.com \
+docker compose -f compose.yaml -f compose.prod.yaml up --wait           
+```
+
+By default, the application uses Let's Encrypt to automatically generate a TLS certificate for your domain. To disable HTTPS, set `SERVER_NAME` to `:80` instead of your domain name.
+If your server is behind a firewall, ensure that ports 80 and 443 are open to allow incoming traffic for successful TLS certificate generation with Let's Encrypt.
+
+### Use your own TLS certificates
+
+Put your TLS certificates in the `frankenphp/certs`
+And run
+
+```bash
+SERVER_NAME=your-domain-name.example.com:443 \
+CADDY_SERVER_EXTRA_DIRECTIVES="tls /etc/caddy/certs/your_custom_public_certificate.crt /etc/caddy/certs/your_custom_private_certificate.key" \
+docker compose -f compose.yaml -f compose.prod.yaml up --wait
+```
