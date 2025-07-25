@@ -31,3 +31,7 @@ phpstan.neon
 /phpunit.xml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
+
+###> certificates ###
+/frankenphp/certs/
+###< certificates ###

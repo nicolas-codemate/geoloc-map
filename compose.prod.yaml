@@ -6,9 +6,8 @@ services:
       target: frankenphp_prod
     env_file:
       - .env.prod.local
+    volumes:
+      - ./frankenphp/certs:/etc/caddy/certs:ro
     environment:
-      APP_SECRET: ${APP_SECRET}
       MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET}
       MERCURE_SUBSCRIBER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET}
-      # disable worker mode (since we're going to use env var to configure the project, I want to make sure every request is fresh)
-      FRANKENPHP_CONFIG:
