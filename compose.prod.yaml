@@ -9,6 +9,7 @@ services:
     volumes:
       - ./frankenphp/certs:/etc/caddy/certs:ro
     environment:
+      SERVER_NAME: ${SERVER_NAME:-https://localhost}
       MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET}
       MERCURE_SUBSCRIBER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET}
       CADDY_SERVER_EXTRA_DIRECTIVES: ${CADDY_SERVER_EXTRA_DIRECTIVES:-}
