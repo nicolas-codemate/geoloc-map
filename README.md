@@ -75,19 +75,92 @@ Configure the objects and their respective data sources using `GEOLOC_OBJECTS` i
 ]
 ```
 
-### Deployment in production using docker
+## Production Deployment
+
+### Option A: Using Pre-built DockerHub Image (Recommended)
+
+The easiest way to deploy in production is using our pre-built Docker image:
+
+```bash
+docker run -d \
+  --name geoloc-map \
+  -p 80:80 \
+  -p 443:443 \
+  -e SERVER_NAME="your-domain.example.com" \
+  -e APP_SECRET="$(openssl rand -hex 32)" \
+  -e GEOLOC_OBJECTS='[{"mapName":"example","default_latitude":48.8575,"default_longitude":2.3514,"default_zoom_level":12,"refresh_interval":5000,"objects":[{"name":"Test Object","enable_sandbox":true}]}]' \
+  nicolascodemate/geoloc-map:latest
+```
+
+**Required Environment Variables:**
+- `SERVER_NAME`: Your domain name or `:80` for HTTP-only
+- `APP_SECRET`: Generate with `openssl rand -hex 32` 
+- `GEOLOC_OBJECTS`: JSON configuration (see examples below)
+
+**Optional:**
+- `CADDY_SERVER_EXTRA_DIRECTIVES`: For custom SSL certificates
+
+**Configuration Examples:**
+- `GEOLOC_OBJECTS.example.json`: Configuration examples with multiple scenarios
+
+### Docker Desktop Quick Setup
+
+1. Open Docker Desktop
+2. Go to **Images** → Search for `nicolascodemate/geoloc-map`
+3. Click **Run** → **Optional settings**
+4. **Port mappings**: Add `80:80` and `443:443`  
+5. **Environment variables**:
+   ```
+   SERVER_NAME=localhost
+   APP_SECRET=your-generated-secret-32-chars
+   GEOLOC_OBJECTS=your-json-config
+   ```
+6. **Run** the container
+7. Access your maps at: `http://localhost/{mapName}`
+
+### Portainer Quick Setup
+
+1. Go to **Containers** → **Add container**
+2. **Image**: `nicolascodemate/geoloc-map:latest`
+3. **Network ports**: 
+   - `80:80/tcp`
+   - `443:443/tcp`
+4. **Environment variables**:
+   ```
+   SERVER_NAME=your-domain.example.com
+   APP_SECRET=your-generated-secret
+   GEOLOC_OBJECTS=your-json-config
+   ```
+5. **Volumes** (if using custom certificates):
+   ```
+   /host/path/to/certs:/etc/caddy/certs:ro
+   ```
+6. **Deploy the container**
+
+### Option B: Build from Source
+
+For customization or development:
+
 ```bash
 docker compose -f compose.yaml -f compose.prod.yaml build --pull --no-cache
 SERVER_NAME=your-domain-name.example.com \
 docker compose -f compose.yaml -f compose.prod.yaml up --wait
 ```
 
-or
+### Custom SSL Certificates
 
-```
-docker compose -f compose.yaml -f compose.prod.yaml build --pull --no-cache
-# run the container by using port 8080 (for cloudrun)
-docker run -e SERVER_NAME=:8080 -e HTTP_PORT=8080 -p 8080:8080 geoloc-map:latest                                                                              
+Mount your certificates and configure Caddy:
+
+```bash
+docker run -d \
+  --name geoloc-map \
+  -p 80:80 -p 443:443 \
+  -v /path/to/your/certs:/etc/caddy/certs:ro \
+  -e SERVER_NAME="your-domain.example.com" \
+  -e APP_SECRET="your-secure-secret" \
+  -e GEOLOC_OBJECTS='your-json-config' \
+  -e CADDY_SERVER_EXTRA_DIRECTIVES="tls /etc/caddy/certs/cert.crt /etc/caddy/certs/key.key" \
+  nicolascodemate/geoloc-map:latest
 ```
 
 ### Configuration Details:

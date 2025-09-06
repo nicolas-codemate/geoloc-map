@@ -1,0 +1,106 @@
+[
+  {
+    "mapName": "company_fleet",
+    "default_latitude": 48.8575,
+    "default_longitude": 2.3514,
+    "default_zoom_level": 12,
+    "refresh_interval": 10000,
+    "time_ranges": [
+      {
+        "days": [
+          "Monday",
+          "Tuesday", 
+          "Wednesday",
+          "Thursday",
+          "Friday"
+        ],
+        "start": "08:00",
+        "end": "18:00"
+      },
+      {
+        "days": [
+          "Saturday"
+        ],
+        "start": "09:00",
+        "end": "12:00"
+      }
+    ],
+    "objects": [
+      {
+        "name": "Vehicle 1 - Production API",
+        "url": "https://your-gps-api.example.com/location",
+        "query_params": {
+          "vehicle_id": "fleet_001",
+          "api_key": "your-secure-api-key",
+          "format": "json"
+        },
+        "latitude_json_path": "coordinates.lat",
+        "longitude_json_path": "coordinates.lng"
+      },
+      {
+        "name": "Vehicle 2 - Jeedom Integration",
+        "url": "https://jeedom.example.com/core/api/jeeApi.php",
+        "query_params": {
+          "apikey": "jeedom-api-key",
+          "method": "get",
+          "plugin": "jMQTT",
+          "type": "cmd",
+          "id": "[779,780]"
+        },
+        "latitude_json_path": "779",
+        "longitude_json_path": "780"
+      }
+    ]
+  },
+  {
+    "mapName": "demo_sandbox",
+    "default_latitude": 45.764043,
+    "default_longitude": 4.835659,
+    "default_zoom_level": 10,
+    "refresh_interval": 5000,
+    "objects": [
+      {
+        "name": "Demo Vehicle (Sandbox)",
+        "enable_sandbox": true
+      },
+      {
+        "name": "Another Demo Object",
+        "enable_sandbox": true
+      }
+    ]
+  },
+  {
+    "mapName": "my_personal_car",
+    "default_latitude": 48.8575,
+    "default_longitude": 2.3514,
+    "default_zoom_level": 15,
+    "refresh_interval": 30000,
+    "time_ranges": [
+      {
+        "days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday", 
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "start": "06:00",
+        "end": "23:59"
+      }
+    ],
+    "objects": [
+      {
+        "name": "My Car",
+        "url": "https://car-tracker-api.example.com/v1/position",
+        "query_params": {
+          "device_id": "car_tracker_123",
+          "token": "bearer-token-here"
+        },
+        "latitude_json_path": "location.latitude",
+        "longitude_json_path": "location.longitude"
+      }
+    ]
+  }
+]
