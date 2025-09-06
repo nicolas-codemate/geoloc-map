@@ -74,6 +74,19 @@ CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile", "--watch" ]
 # Prod FrankenPHP image
 FROM frankenphp_base AS frankenphp_prod
 
+ARG BUILDTIME
+ARG VERSION
+ARG REVISION
+
+LABEL org.opencontainers.image.title="Geoloc Map"
+LABEL org.opencontainers.image.description="Symfony geolocation mapping application with FrankenPHP"
+LABEL org.opencontainers.image.vendor="Nicolas Codemate"
+LABEL org.opencontainers.image.created=${BUILDTIME}
+LABEL org.opencontainers.image.version=${VERSION}
+LABEL org.opencontainers.image.revision=${REVISION}
+LABEL org.opencontainers.image.source="https://github.com/nicolas-codemate/geoloc-map"
+LABEL org.opencontainers.image.documentation="https://github.com/nicolas-codemate/geoloc-map/blob/main/CLIENT-DEPLOYMENT.md"
+
 ENV APP_ENV=prod
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
