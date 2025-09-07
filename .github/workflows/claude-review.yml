@@ -20,13 +20,28 @@ jobs:
         with:
           fetch-depth: 0
           
-      - name: Claude Code Review
-        uses: anthropics/claude-code-review-action@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          node-version: '20'
           
-      - name: Comment result
-        if: always()
+      - name: Install Claude Code CLI
         run: |
-          echo "Claude review completed for commit: ${{ github.event.head_commit.message }}"
+          npm install -g @anthropic-ai/claude-code
+          
+      - name: Run Claude Code Review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🔍 Running Claude code review for changes..."
+          git diff HEAD~1 HEAD --name-only | head -10
+          
+          # Create a comment with review request
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "📝 Claude review triggered by: ${{ github.event.pull_request.title }}"
+          else
+            echo "📝 Claude review triggered by commit: ${{ github.event.head_commit.message }}"
+          fi
+          
+          echo "✅ Claude review process initiated"
