@@ -1,0 +1,32 @@
+name: Claude Code Review
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
+
+jobs:
+  claude-review:
+    name: Claude Code Review
+    runs-on: ubuntu-latest
+    
+    # Only run if commit message contains "@claude"
+    if: contains(github.event.head_commit.message, '@claude') || contains(github.event.pull_request.title, '@claude') || contains(github.event.pull_request.body, '@claude')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Claude Code Review
+        uses: anthropics/claude-code-review-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Comment result
+        if: always()
+        run: |
+          echo "Claude review completed for commit: ${{ github.event.head_commit.message }}"
