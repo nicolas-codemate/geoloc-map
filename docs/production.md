@@ -57,7 +57,23 @@ Example with Git:
 git clone git@github.com:<username>/<project-name>.git
 ```
 
-Go into the directory containing your project (`<project-name>`), and start the app in production mode:
+Go into the directory containing your project (`<project-name>`).
+
+### Creating Persistent Volumes for Let's Encrypt Certificates
+
+**IMPORTANT**: Before deploying for the first time, create external Docker volumes to persist Let's Encrypt certificates across container recreations. This prevents hitting Let's Encrypt rate limits (5 certificates per domain per week).
+
+```console
+# Create external volumes (run only once on first deployment)
+docker volume create caddy_data
+docker volume create caddy_config
+```
+
+These volumes will store your Let's Encrypt certificates and persist even when containers are recreated or updated. See [Let's Encrypt Certificate Management](letsencrypt.md) for more details.
+
+### Starting the Application
+
+Now start the app in production mode:
 
 ```console
 # Build fresh production image

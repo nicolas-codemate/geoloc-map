@@ -13,3 +13,11 @@ services:
       APP_SECRET: ${APP_SECRET}
       GEOLOC_OBJECTS: ${GEOLOC_OBJECTS}
       CADDY_SERVER_EXTRA_DIRECTIVES: ${CADDY_SERVER_EXTRA_DIRECTIVES:-}
+
+# Override volumes to use external volumes in production
+# This ensures Let's Encrypt certificates persist across container recreations
+volumes:
+  caddy_data:
+    external: true
+  caddy_config:
+    external: true
