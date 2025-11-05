@@ -16,6 +16,31 @@ const getMarkersFromMap = (map) => {
   return markers;
 }
 
+const openPopupsWhenMapReady = (map, markers) => {
+  // Wait for the map to finish all animations and rendering
+  const openPopups = () => {
+    // Use requestAnimationFrame to ensure the DOM is fully rendered
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        markers.forEach(marker => {
+          if (marker.getPopup()) {
+            marker.openPopup();
+          }
+        });
+      });
+    });
+  };
+
+  // Check if map is currently animating
+  if (map._animatingZoom || map._panAnim) {
+    // Wait for the map to finish moving/zooming
+    map.once('moveend', openPopups);
+  } else {
+    // Map is already stable, open popups immediately
+    openPopups();
+  }
+};
+
 const centerMapOnMarkers = (map, L, newMarker) => {
   const markers = getMarkersFromMap(map);
 
@@ -25,10 +50,6 @@ const centerMapOnMarkers = (map, L, newMarker) => {
     // Add all markers to bounds
     markers.forEach(marker => {
       bounds.extend(marker.getLatLng());
-      // force open popup if it exists
-      if (marker.getPopup()) {
-        setTimeout(() => marker.openPopup(), 0); // simulate a next tick to ensure the popup opens after the map is centered
-      }
     });
 
     if (bounds.isValid()) {
@@ -42,7 +63,9 @@ const centerMapOnMarkers = (map, L, newMarker) => {
           const isMarkerInView = currentBounds.contains(newMarkerPosition);
 
           if (isMarkerInView) {
-            return; // Don't move the map if marker is already visible
+            // Marker is already visible, just open popups without moving map
+            openPopupsWhenMapReady(map, markers);
+            return;
           }
         }
 
@@ -59,6 +82,9 @@ const centerMapOnMarkers = (map, L, newMarker) => {
           animate: true,
         });
       }
+
+      // Open popups after map finishes moving
+      openPopupsWhenMapReady(map, markers);
     }
   }
 }
