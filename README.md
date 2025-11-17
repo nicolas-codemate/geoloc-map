@@ -79,13 +79,23 @@ Configure the objects and their respective data sources using `GEOLOC_OBJECTS` i
 
 ### Option A: Using Pre-built DockerHub Image (Recommended)
 
-The easiest way to deploy in production is using our pre-built Docker image:
+The easiest way to deploy in production is using our pre-built Docker image.
+
+**⚠️ First, create persistent volumes for Let's Encrypt certificates:**
+```bash
+docker volume create caddy_data
+docker volume create caddy_config
+```
+
+Then deploy the container:
 
 ```bash
 docker run -d \
   --name geoloc-map \
   -p 80:80 \
   -p 443:443 \
+  -v caddy_data:/data \
+  -v caddy_config:/config \
   -e SERVER_NAME="your-domain.example.com" \
   -e APP_SECRET="$(openssl rand -hex 32)" \
   -e GEOLOC_OBJECTS='[{"mapName":"example","default_latitude":48.8575,"default_longitude":2.3514,"default_zoom_level":12,"refresh_interval":5000,"objects":[{"name":"Test Object","enable_sandbox":true}]}]' \
@@ -105,24 +115,39 @@ docker run -d \
 
 ### Docker Desktop Quick Setup
 
+**⚠️ First, create volumes for certificate persistence:**
+Go to **Volumes** → Create two volumes: `caddy_data` and `caddy_config`
+
+Then deploy the container:
+
 1. Open Docker Desktop
 2. Go to **Images** → Search for `nicolascodemate/geoloc-map`
 3. Click **Run** → **Optional settings**
-4. **Port mappings**: Add `80:80` and `443:443`  
-5. **Environment variables**:
+4. **Port mappings**: Add `80:80` and `443:443`
+5. **Volumes**:
+   - Host path: `caddy_data` → Container path: `/data`
+   - Host path: `caddy_config` → Container path: `/config`
+6. **Environment variables**:
    ```
    SERVER_NAME=localhost
    APP_SECRET=your-generated-secret-32-chars
    GEOLOC_OBJECTS=your-json-config
    ```
-6. **Run** the container
-7. Access your maps at: `http://localhost/{mapName}`
+7. **Run** the container
+8. Access your maps at: `http://localhost/{mapName}`
 
 ### Portainer Quick Setup
 
+**⚠️ First, create volumes for certificate persistence:**
+Go to **Volumes** → **Add volume**:
+- Name: `caddy_data` → Create
+- Name: `caddy_config` → Create
+
+Then create the container:
+
 1. Go to **Containers** → **Add container**
 2. **Image**: `nicolascodemate/geoloc-map:latest`
-3. **Network ports**: 
+3. **Network ports**:
    - `80:80/tcp`
    - `443:443/tcp`
 4. **Environment variables**:
@@ -131,15 +156,25 @@ docker run -d \
    APP_SECRET=your-generated-secret
    GEOLOC_OBJECTS=your-json-config
    ```
-5. **Volumes** (if using custom certificates):
-   ```
-   /host/path/to/certs:/etc/caddy/certs:ro
-   ```
+5. **Volumes** (required for certificate persistence):
+   - `caddy_data:/data`
+   - `caddy_config:/config`
+
+   Optional (if using custom certificates):
+   - `/host/path/to/certs:/etc/caddy/certs:ro`
 6. **Deploy the container**
 
 ### Option B: Build from Source
 
-For customization or development:
+For customization or development.
+
+**⚠️ First, create persistent volumes:**
+```bash
+docker volume create caddy_data
+docker volume create caddy_config
+```
+
+Then build and deploy:
 
 ```bash
 docker compose -f compose.yaml -f compose.prod.yaml build --pull --no-cache
@@ -281,6 +316,13 @@ docker compose -f compose.yaml -f compose.prod.yaml up --wait
 
 By default, the application uses Let's Encrypt to automatically generate a TLS certificate for your domain. To disable HTTPS, set `SERVER_NAME` to `:80` instead of your domain name.
 If your server is behind a firewall, ensure that ports 80 and 443 are open to allow incoming traffic for successful TLS certificate generation with Let's Encrypt.
+
+**⚠️ Important**: To avoid hitting Let's Encrypt rate limits, create persistent volumes before your first deployment:
+```bash
+docker volume create caddy_data
+docker volume create caddy_config
+```
+This ensures certificates persist across container restarts. See [docs/letsencrypt.md](docs/letsencrypt.md) for detailed information.
 
 ### Use your own TLS certificates
 
