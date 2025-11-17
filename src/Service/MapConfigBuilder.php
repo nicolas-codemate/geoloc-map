@@ -20,6 +20,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 readonly class MapConfigBuilder
 {
+    /**
+     * @param array<int, mixed> $geolocatableObjects
+     */
     public function __construct(
         #[Autowire(env: 'json:GEOLOC_OBJECTS')]
         private array $geolocatableObjects,
@@ -99,13 +102,17 @@ readonly class MapConfigBuilder
         );
     }
 
+    /**
+     * @param array<int, string> $days
+     * @return array<int, DayMatcher>
+     */
     private function parseDayMatchers(array $days): array
     {
         $dayMatchers = [];
 
         foreach ($days as $day) {
             try {
-                $dayMatchers[] = DayMatcher::fromString($day, $this->holidayCalculator);
+                $dayMatchers[] = DayMatcher::fromString($day);
             } catch (InvalidDayMatcherException $e) {
                 $this->logger->warning("Invalid day format: {$day}", [
                     'exception' => $e->getMessage(),

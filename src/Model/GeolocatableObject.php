@@ -12,6 +12,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class GeolocatableObject implements GeolocatableObjectInterface
 {
+    /**
+     * @param array<string, mixed> $queryParams
+     */
     public function __construct(
         public string $name,
         public string $url,

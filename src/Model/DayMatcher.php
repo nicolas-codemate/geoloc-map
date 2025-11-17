@@ -21,7 +21,7 @@ readonly class DayMatcher implements Stringable
     ) {
     }
 
-    public static function fromString(string $day, FrenchHolidayCalculator $calculator): self
+    public static function fromString(string $day): self
     {
         $day = trim($day);
 

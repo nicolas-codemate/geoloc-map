@@ -8,17 +8,17 @@ use DateTimeImmutable;
 
 enum FrenchHoliday: string
 {
-    case NEW_YEAR = 'new_year';
-    case EASTER_MONDAY = 'easter_monday';
-    case LABOR_DAY = 'labor_day';
-    case VICTORY_DAY = 'victory_day';
-    case ASCENSION = 'ascension';
-    case WHIT_MONDAY = 'whit_monday';
-    case BASTILLE_DAY = 'bastille_day';
-    case ASSUMPTION = 'assumption';
-    case ALL_SAINTS = 'all_saints';
-    case ARMISTICE = 'armistice';
-    case CHRISTMAS = 'christmas';
+    case NewYear = 'new_year';
+    case EasterMonday = 'easter_monday';
+    case LaborDay = 'labor_day';
+    case VictoryDay = 'victory_day';
+    case Ascension = 'ascension';
+    case WhitMonday = 'whit_monday';
+    case BastilleDay = 'bastille_day';
+    case Assumption = 'assumption';
+    case AllSaints = 'all_saints';
+    case Armistice = 'armistice';
+    case Christmas = 'christmas';
 
     public function getKeyword(): string
     {
@@ -28,7 +28,7 @@ enum FrenchHoliday: string
     public function isFixedDate(): bool
     {
         return match ($this) {
-            self::EASTER_MONDAY, self::ASCENSION, self::WHIT_MONDAY => false,
+            self::EasterMonday, self::Ascension, self::WhitMonday => false,
             default => true,
         };
     }
@@ -36,14 +36,14 @@ enum FrenchHoliday: string
     public function getFixedMonthDay(): ?string
     {
         return match ($this) {
-            self::NEW_YEAR => '01-01',
-            self::LABOR_DAY => '05-01',
-            self::VICTORY_DAY => '05-08',
-            self::BASTILLE_DAY => '07-14',
-            self::ASSUMPTION => '08-15',
-            self::ALL_SAINTS => '11-01',
-            self::ARMISTICE => '11-11',
-            self::CHRISTMAS => '12-25',
+            self::NewYear => '01-01',
+            self::LaborDay => '05-01',
+            self::VictoryDay => '05-08',
+            self::BastilleDay => '07-14',
+            self::Assumption => '08-15',
+            self::AllSaints => '11-01',
+            self::Armistice => '11-11',
+            self::Christmas => '12-25',
             default => null,
         };
     }
@@ -51,17 +51,17 @@ enum FrenchHoliday: string
     public function getName(): string
     {
         return match ($this) {
-            self::NEW_YEAR => 'New Year\'s Day',
-            self::EASTER_MONDAY => 'Easter Monday',
-            self::LABOR_DAY => 'Labor Day',
-            self::VICTORY_DAY => 'Victory in Europe Day',
-            self::ASCENSION => 'Ascension Day',
-            self::WHIT_MONDAY => 'Whit Monday',
-            self::BASTILLE_DAY => 'Bastille Day',
-            self::ASSUMPTION => 'Assumption of Mary',
-            self::ALL_SAINTS => 'All Saints\' Day',
-            self::ARMISTICE => 'Armistice Day',
-            self::CHRISTMAS => 'Christmas',
+            self::NewYear => 'New Year\'s Day',
+            self::EasterMonday => 'Easter Monday',
+            self::LaborDay => 'Labor Day',
+            self::VictoryDay => 'Victory in Europe Day',
+            self::Ascension => 'Ascension Day',
+            self::WhitMonday => 'Whit Monday',
+            self::BastilleDay => 'Bastille Day',
+            self::Assumption => 'Assumption of Mary',
+            self::AllSaints => 'All Saints\' Day',
+            self::Armistice => 'Armistice Day',
+            self::Christmas => 'Christmas',
         };
     }
 
@@ -70,6 +70,9 @@ enum FrenchHoliday: string
         return self::tryFrom(strtolower($keyword));
     }
 
+    /**
+     * @return array<FrenchHoliday>
+     */
     public static function all(): array
     {
         return self::cases();

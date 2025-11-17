@@ -9,6 +9,9 @@ use DateTimeImmutable;
 
 class FrenchHolidayCalculator
 {
+    /**
+     * @var array<string, DateTimeImmutable>
+     */
     private array $cache = [];
 
     public function getHolidayDate(FrenchHoliday $holiday, int $year): DateTimeImmutable
@@ -20,17 +23,17 @@ class FrenchHolidayCalculator
         }
 
         $date = match ($holiday) {
-            FrenchHoliday::NEW_YEAR => new DateTimeImmutable("{$year}-01-01"),
-            FrenchHoliday::LABOR_DAY => new DateTimeImmutable("{$year}-05-01"),
-            FrenchHoliday::VICTORY_DAY => new DateTimeImmutable("{$year}-05-08"),
-            FrenchHoliday::BASTILLE_DAY => new DateTimeImmutable("{$year}-07-14"),
-            FrenchHoliday::ASSUMPTION => new DateTimeImmutable("{$year}-08-15"),
-            FrenchHoliday::ALL_SAINTS => new DateTimeImmutable("{$year}-11-01"),
-            FrenchHoliday::ARMISTICE => new DateTimeImmutable("{$year}-11-11"),
-            FrenchHoliday::CHRISTMAS => new DateTimeImmutable("{$year}-12-25"),
-            FrenchHoliday::EASTER_MONDAY => $this->calculateEasterMonday($year),
-            FrenchHoliday::ASCENSION => $this->calculateAscension($year),
-            FrenchHoliday::WHIT_MONDAY => $this->calculateWhitMonday($year),
+            FrenchHoliday::NewYear => new DateTimeImmutable("{$year}-01-01"),
+            FrenchHoliday::LaborDay => new DateTimeImmutable("{$year}-05-01"),
+            FrenchHoliday::VictoryDay => new DateTimeImmutable("{$year}-05-08"),
+            FrenchHoliday::BastilleDay => new DateTimeImmutable("{$year}-07-14"),
+            FrenchHoliday::Assumption => new DateTimeImmutable("{$year}-08-15"),
+            FrenchHoliday::AllSaints => new DateTimeImmutable("{$year}-11-01"),
+            FrenchHoliday::Armistice => new DateTimeImmutable("{$year}-11-11"),
+            FrenchHoliday::Christmas => new DateTimeImmutable("{$year}-12-25"),
+            FrenchHoliday::EasterMonday => $this->calculateEasterMonday($year),
+            FrenchHoliday::Ascension => $this->calculateAscension($year),
+            FrenchHoliday::WhitMonday => $this->calculateWhitMonday($year),
         };
 
         $this->cache[$cacheKey] = $date;

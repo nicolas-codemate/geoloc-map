@@ -53,6 +53,7 @@ final class MapLive
 
     protected function instantiateMap(): Map
     {
+        assert($this->mapName !== null, 'mapName must be set');
         $mapConfig = $this->mapConfigBuilder->buildMapConfig($this->mapName);
 
         $this->refreshInterval = $mapConfig->refreshInterval;
@@ -87,6 +88,7 @@ final class MapLive
     #[LiveAction]
     public function refreshMap(): void
     {
+        assert($this->mapName !== null, 'mapName must be set');
         $mapConfig = $this->mapConfigBuilder->buildMapConfig($this->mapName);
 
         $this->fetchGeolocationData($this->getMap(), $mapConfig);
