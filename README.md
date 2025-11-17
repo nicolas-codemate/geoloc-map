@@ -128,33 +128,109 @@ Then deploy the container:
 7. **Run** the container
 8. Access your maps at: `http://localhost/{mapName}`
 
-### Portainer Quick Setup
+### Portainer Deployment
 
-**⚠️ First, create volumes for certificate persistence:**
+#### Step 1: Create Volumes for Certificate Persistence
+
 Go to **Volumes** → **Add volume**:
-- Name: `caddy_data` → Create
-- Name: `caddy_config` → Create
+- Name: `caddy_data` → Click **Create the volume**
+- Name: `caddy_config` → Click **Create the volume**
 
-Then create the container:
+These volumes will persist Let's Encrypt certificates across container updates.
+
+#### Step 2: Prepare Configuration File
+
+On your server, create the configuration file:
+
+```bash
+# SSH to your server
+ssh user@your-server
+
+# Create directory
+mkdir -p /opt/geoloc-map
+
+# Create configuration file
+nano /opt/geoloc-map/geoloc.json
+```
+
+Paste your configuration and save. **Example:**
+```json
+[
+  {
+    "mapName": "fleet",
+    "default_latitude": 48.8575,
+    "default_longitude": 2.3514,
+    "default_zoom_level": 12,
+    "refresh_interval": 10000,
+    "objects": [
+      {
+        "name": "Vehicle 1",
+        "enable_sandbox": true
+      }
+    ]
+  }
+]
+```
+
+#### Step 3: Deploy Container in Portainer
 
 1. Go to **Containers** → **Add container**
-2. **Image**: `nicolascodemate/geoloc-map:latest`
-3. **Network ports**:
-   - `80:80/tcp`
-   - `443:443/tcp`
-4. **Environment variables**:
-   ```
-   SERVER_NAME=your-domain.example.com
-   APP_SECRET=your-generated-secret
-   GEOLOC_OBJECTS=your-json-config
-   ```
-5. **Volumes** (required for certificate persistence):
-   - `caddy_data:/data`
-   - `caddy_config:/config`
 
-   Optional (if using custom certificates):
-   - `/host/path/to/certs:/etc/caddy/certs:ro`
-6. **Deploy the container**
+2. **Name**: `geoloc-map`
+
+3. **Image**: `nicolascodemate/geoloc-map:latest`
+
+4. **Network ports configuration**:
+   - Click **publish a new network port**
+   - `80:80/tcp` → Add
+   - `443:443/tcp` → Add
+
+5. **Advanced container settings** → **Volumes** tab:
+
+   **Volume mapping:**
+   - Click **map additional volume**
+   - Container: `/data` → Volume: `caddy_data` → **Bind** mode
+   - Click **map additional volume**
+   - Container: `/config` → Volume: `caddy_config` → **Bind** mode
+   - Click **map additional volume**
+   - Container: `/app/geoloc.json` → Host: `/opt/geoloc-map/geoloc.json` → **Bind** mode, **Read-only** ✓
+
+6. **Advanced container settings** → **Env** tab:
+
+   Click **add environment variable** for each:
+   ```
+   Name: SERVER_NAME          Value: https://your-domain.example.com
+   Name: APP_SECRET           Value: your-generated-secret-32-chars
+   Name: GEOLOC_OBJECTS_FILE  Value: /app/geoloc.json
+   ```
+
+7. **Advanced container settings** → **Restart policy**:
+   - Select: `Unless stopped`
+
+8. Click **Deploy the container**
+
+#### Step 4: Verify Deployment
+
+1. Check logs: **Containers** → `geoloc-map` → **Logs**
+2. Look for: `certificate obtained successfully`
+3. Access: `https://your-domain.example.com/fleet`
+
+#### Updating Configuration
+
+To modify `geoloc.json` without redeploying:
+
+```bash
+# Edit on server
+nano /opt/geoloc-map/geoloc.json
+
+# Clear Symfony cache via Portainer:
+# Containers → geoloc-map → Console → Connect
+# Then run: bin/console cache:clear
+
+# Or restart container in Portainer
+```
+
+Changes are visible immediately after cache clear!
 
 ### Option B: Using Docker Compose (Recommended for Server Deployments)
 
