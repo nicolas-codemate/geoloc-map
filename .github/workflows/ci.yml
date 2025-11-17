@@ -43,7 +43,7 @@ jobs:
         run: composer install --prefer-dist --no-progress --no-interaction
 
       - name: Run PHPStan (Level 8)
-        run: vendor/bin/phpstan analyze --configuration=phpstan.neon
+        run: vendor/bin/phpstan analyze --configuration=phpstan.dist.neon
 
       - name: Run PHPUnit
         run: vendor/bin/phpunit
