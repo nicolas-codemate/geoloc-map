@@ -35,3 +35,9 @@ phpstan.neon
 ###> certificates ###
 /frankenphp/certs/
 ###< certificates ###
+
+###> geoloc configuration ###
+# Ignore production configuration file (may contain API keys and secrets)
+# Copy geoloc.example.json to geoloc.json and customize for your needs
+/geoloc.json
+###< geoloc configuration ###

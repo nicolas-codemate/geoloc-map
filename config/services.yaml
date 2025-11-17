@@ -5,7 +5,10 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     env(GEOLOC_OBJECTS): '[]'
-    geoloc_objects: '%env(json:GEOLOC_OBJECTS)%'
+    env(GEOLOC_OBJECTS_FILE): ''
+    # Use external JSON file if GEOLOC_OBJECTS_FILE is set, otherwise fallback to GEOLOC_OBJECTS env var
+    # Priority: GEOLOC_OBJECTS_FILE > GEOLOC_OBJECTS
+    geoloc_objects: '%env(default:json:GEOLOC_OBJECTS:json:file:resolve:GEOLOC_OBJECTS_FILE)%'
 
 services:
     # default configuration for services in *this* file

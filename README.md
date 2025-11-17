@@ -13,67 +13,40 @@ This project provides a simple and flexible way to geolocate multiple objects ba
 
 This project is ideal for scenarios where you need to display geolocation data for multiple objects on individual maps, with the ability to integrate these maps into external web pages.
 
-## How It Works
+## Configuration
 
-Configure the objects and their respective data sources using `GEOLOC_OBJECTS` in JSON format.
+Geoloc-Map uses JSON configuration to define maps and their geolocatable objects. You can configure using either:
 
+1. **External JSON file** (recommended) - `geoloc.json`
+2. **Environment variable** - `GEOLOC_OBJECTS`
+
+**Quick example:**
 ```json
 [
-    {
-        "mapName": "my_car",
-        "default_latitude": 48.8575,
-        "default_longitude": 2.3514,
-        "default_zoom_level": 12,
-        "refresh_interval": 5000,
-        "time_ranges": [
-            {
-                "days": [
-                    "Monday",
-                    "Tuesday",
-                    "Wednesday",
-                    "Thursday",
-                    "Friday"
-                ],
-                "start": "08:00",
-                "end": "12:00"
-            },
-            {
-                "days": [
-                    "Monday",
-                    "Tuesday",
-                    "Wednesday",
-                    "Thursday",
-                    "Friday"
-                ],
-                "start": "14:00",
-                "end": "18:00"
-            },
-            {
-                "name": [
-                    "Saturday"
-                ],
-                "start": "09:00",
-                "end": "12:00"
-            }
-        ],
-        "objects": [
-            {
-                "name": "Mon super véhicule",
-                "url": "https://my_jeedom_domain.com/core/api/jeeApi.php",
-                "query_params": {
-                    "apikey": "**JEEDOM_API_KEY**",
-                    "method": "get",
-                    "plugin": "jMQTT",
-                    "type": "cmd",
-                    "id": "[779,780]"
-                },
-                "latitude_json_path": "779",
-                "longitude_json_path": "780"
-            }
-        ]
-    }
+  {
+    "mapName": "my_car",
+    "default_latitude": 48.8575,
+    "default_longitude": 2.3514,
+    "default_zoom_level": 12,
+    "refresh_interval": 5000,
+    "objects": [
+      {
+        "name": "My Vehicle",
+        "url": "https://gps-api.example.com/location",
+        "query_params": {"device_id": "car_001"},
+        "latitude_json_path": "location.lat",
+        "longitude_json_path": "location.lng"
+      }
+    ]
+  }
 ]
 ```
+
+Access your map at: `https://your-domain.com/my_car`
+
+**📖 For complete configuration options, examples, and best practices, see:**
+- **[Configuration Guide](docs/configuration.md)** - Detailed documentation
+- **[geoloc.example.json](GEOLOC_OBJECTS.example.json)** - Template with examples
 
 ## Production Deployment
 
@@ -89,6 +62,7 @@ docker volume create caddy_config
 
 Then deploy the container:
 
+**With inline JSON configuration:**
 ```bash
 docker run -d \
   --name geoloc-map \
@@ -102,16 +76,34 @@ docker run -d \
   nicolascodemate/geoloc-map:latest
 ```
 
+**With external JSON file (Recommended):**
+```bash
+# First, create your geoloc.json file, then:
+docker run -d \
+  --name geoloc-map \
+  -p 80:80 \
+  -p 443:443 \
+  -v caddy_data:/data \
+  -v caddy_config:/config \
+  -v $(pwd)/geoloc.json:/app/geoloc.json:ro \
+  -e SERVER_NAME="your-domain.example.com" \
+  -e APP_SECRET="$(openssl rand -hex 32)" \
+  -e GEOLOC_OBJECTS_FILE="/app/geoloc.json" \
+  nicolascodemate/geoloc-map:latest
+```
+
 **Required Environment Variables:**
 - `SERVER_NAME`: Your domain name or `:80` for HTTP-only
-- `APP_SECRET`: Generate with `openssl rand -hex 32` 
-- `GEOLOC_OBJECTS`: JSON configuration (see examples below)
+- `APP_SECRET`: Generate with `openssl rand -hex 32`
+- `GEOLOC_OBJECTS`: JSON configuration string **OR**
+- `GEOLOC_OBJECTS_FILE`: Path to mounted JSON file (recommended)
 
 **Optional:**
 - `CADDY_SERVER_EXTRA_DIRECTIVES`: For custom SSL certificates
 
 **Configuration Examples:**
-- `GEOLOC_OBJECTS.example.json`: Configuration examples with multiple scenarios
+- `geoloc.example.json`: Template file with examples
+- [Configuration Guide](docs/configuration.md): Complete documentation
 
 ### Docker Desktop Quick Setup
 
@@ -164,9 +156,9 @@ Then create the container:
    - `/host/path/to/certs:/etc/caddy/certs:ro`
 6. **Deploy the container**
 
-### Option B: Build from Source
+### Option B: Using Docker Compose (Recommended for Server Deployments)
 
-For customization or development.
+Deploy using Docker Compose with the pre-built image from DockerHub.
 
 **⚠️ First, create persistent volumes:**
 ```bash
@@ -174,13 +166,78 @@ docker volume create caddy_data
 docker volume create caddy_config
 ```
 
-Then build and deploy:
+**Setup configuration:**
+```bash
+# Clone or download the compose files
+git clone https://github.com/nicolascodemate/geoloc-map.git
+cd geoloc-map
+
+# Create your configuration
+cp geoloc.example.json geoloc.json
+nano geoloc.json  # Edit with your configuration
+
+# Create environment file
+nano .env.prod.local
+```
+
+**Example `.env.prod.local`:**
+```bash
+SERVER_NAME=https://your-domain.example.com
+APP_SECRET=your-generated-secret-32-chars
+# GEOLOC_OBJECTS_FILE is already set to /app/geoloc.json by default
+```
+
+**Deploy:**
+```bash
+# Pull the latest image and start
+docker compose -f compose.yaml -f compose.prod.yaml pull
+docker compose -f compose.yaml -f compose.prod.yaml up -d
+```
+
+**Update to latest version:**
+```bash
+docker compose -f compose.yaml -f compose.prod.yaml pull
+docker compose -f compose.yaml -f compose.prod.yaml up -d
+```
+
+**Note:** The production compose file uses the pre-built image from DockerHub (built automatically by CI/CD). No build step is required on the server.
+
+---
+
+## Development
+
+### Local Development
+
+For local development with live code reloading:
 
 ```bash
-docker compose -f compose.yaml -f compose.prod.yaml build --pull --no-cache
-SERVER_NAME=your-domain-name.example.com \
-docker compose -f compose.yaml -f compose.prod.yaml up --wait
+# Install dependencies
+make composer c=install
+
+# Start development environment
+make up
+
+# Access at http://localhost:8080
 ```
+
+The development compose file builds the image locally with the `frankenphp_dev` target.
+
+### Building Locally (Optional)
+
+If you need to build the production image locally instead of using the pre-built one:
+
+```bash
+# Uncomment the build section in compose.prod.yaml
+# Then build:
+docker compose -f compose.yaml -f compose.prod.yaml build --pull --no-cache
+
+# Run with locally built image
+docker compose -f compose.yaml -f compose.prod.yaml up -d
+```
+
+**Note:** This is rarely needed as the image is automatically built and published by GitHub Actions on every push to `main`.
+
+---
 
 ### Custom SSL Certificates
 
@@ -198,27 +255,7 @@ docker run -d \
   nicolascodemate/geoloc-map:latest
 ```
 
-### Configuration Details:
-
-* `mapName`: The name of the map, which also serves as the URI of the iframe. For example, my_car will be accessible at https://mydomain.com/my_car.
-* `default_latitude`: The default latitude for the map when no object is visible.
-* `default_longitude`: The default longitude for the map when no object is visible.
-* `default_zoom_level`: The default zoom level for the map when no object is visible.
-* `refresh_interval`: The interval (in milliseconds) at which the map will refresh to fetch new geolocation data.
-* Optionnal `time_ranges`: An array of time ranges to specify when objects should be displayed.
-    * If omitted, objects will always be visible.
-    * Outside the specified time ranges, the map will display the default latitude and longitude with a generic error message indicating no geolocatable objects.
-    * Each time range includes:
-        * `days`: An array of days of the week (e.g., ["Monday", "Tuesday"]).
-        * `start`: The start time of the range (e.g., "08:00").
-        * `end`: The end time of the range (e.g., "20:00").
-* `objects`: An array of objects to display on the map:
-    * `name`: The name of the object.
-    * `url`: The URL to retrieve the geolocation data for the object.
-    * `query_params`: The query parameters to include in the request.
-    * `latitude_json_path`: The JSON path to extract the latitude from the response.
-    * `longitude_json_path`: The JSON path to extract the longitude from the response.
-    * `enable_sandbox`: set to true and omit all other param except name to enable a sandbox mode. It will generate some random coordinate.
+---
 
 ## Installation
 
