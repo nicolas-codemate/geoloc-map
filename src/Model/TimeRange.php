@@ -5,44 +5,54 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Service\FrenchHolidayCalculator;
 use Stringable;
 use Symfony\Component\Clock\DatePoint;
 
-use function in_array;
-
 class TimeRange implements Stringable
 {
-
     /**
-     * Default value is 24/7
+     * @param DayMatcher[] $dayMatchers
      */
     public function __construct(
-        private ?array $days = null,
+        private readonly array $dayMatchers,
         private readonly string $startTime = '00:00',
         private readonly string $endTime = '23:59',
     ) {
-        $this->days = $days ?? ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     }
 
-    public function isCurrentTimeInRange(): bool
+    public function appliesTo(DatePoint $date, FrenchHolidayCalculator $calculator): bool
     {
-        $now = new DatePoint();
+        foreach ($this->dayMatchers as $dayMatcher) {
+            if ($dayMatcher->matches($date, $calculator)) {
+                return true;
+            }
+        }
 
-        $currentDay = $now->format('l'); // 'l' gives the full-day name
-        $currentTime = $now->format('H:i');
+        return false;
+    }
 
-        if (false === in_array($currentDay, $this->days, true)) {
+    public function isOpen(DatePoint $date): bool
+    {
+        if ($this->startTime === 'closed') {
             return false;
         }
 
+        if ($this->startTime === 'open') {
+            return true;
+        }
+
+        $currentTime = $date->format('H:i');
         return ($currentTime >= $this->startTime && $currentTime <= $this->endTime);
     }
 
     public function __toString(): string
     {
+        $days = array_map(fn(DayMatcher $dm) => (string) $dm, $this->dayMatchers);
+
         return sprintf(
             'TimeRange: %s, %s - %s',
-            implode(', ', $this->days),
+            implode(', ', $days),
             $this->startTime,
             $this->endTime
         );

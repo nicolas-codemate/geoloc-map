@@ -27,33 +27,28 @@ Configure the objects and their respective data sources using `GEOLOC_OBJECTS` i
         "refresh_interval": 5000,
         "time_ranges": [
             {
-                "days": [
-                    "Monday",
-                    "Tuesday",
-                    "Wednesday",
-                    "Thursday",
-                    "Friday"
-                ],
-                "start": "08:00",
-                "end": "12:00"
+                "days": ["bastille_day"],
+                "startTime": "10:00",
+                "endTime": "14:00"
             },
             {
-                "days": [
-                    "Monday",
-                    "Tuesday",
-                    "Wednesday",
-                    "Thursday",
-                    "Friday"
-                ],
-                "start": "14:00",
-                "end": "18:00"
+                "days": ["french_holidays"],
+                "startTime": "closed"
             },
             {
-                "name": [
-                    "Saturday"
-                ],
-                "start": "09:00",
-                "end": "12:00"
+                "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                "startTime": "08:00",
+                "endTime": "12:00"
+            },
+            {
+                "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                "startTime": "14:00",
+                "endTime": "18:00"
+            },
+            {
+                "days": ["Saturday"],
+                "startTime": "09:00",
+                "endTime": "12:00"
             }
         ],
         "objects": [
@@ -205,13 +200,67 @@ docker run -d \
 * `default_longitude`: The default longitude for the map when no object is visible.
 * `default_zoom_level`: The default zoom level for the map when no object is visible.
 * `refresh_interval`: The interval (in milliseconds) at which the map will refresh to fetch new geolocation data.
-* Optionnal `time_ranges`: An array of time ranges to specify when objects should be displayed.
-    * If omitted, objects will always be visible.
-    * Outside the specified time ranges, the map will display the default latitude and longitude with a generic error message indicating no geolocatable objects.
+* Optional `time_ranges`: An array of time ranges with priority-based matching (first match wins).
+    * If omitted, objects will always be visible (24/7).
+    * Outside the specified time ranges, the map will display the default latitude and longitude with a message indicating no geolocatable objects.
+    * **Priority System**: Time ranges are evaluated in order. The first rule that matches the current date/time determines visibility. Place more restrictive rules (holidays) before general rules (weekdays).
     * Each time range includes:
-        * `days`: An array of days of the week (e.g., ["Monday", "Tuesday"]).
-        * `start`: The start time of the range (e.g., "08:00").
-        * `end`: The end time of the range (e.g., "20:00").
+        * `days`: An array of day specifiers. Supported formats:
+            * **Day of week**: `"Monday"`, `"Tuesday"`, etc.
+            * **Fixed date** (MM-DD): `"05-01"` for May 1st (any year)
+            * **Full date** (YYYY-MM-DD): `"2025-12-24"` for a specific date
+            * **All French holidays**: `"french_holidays"` for all 11 French public holidays at once
+            * **Individual French holiday keywords**: `"labor_day"`, `"easter_monday"`, `"bastille_day"`, etc. (see list below)
+        * `startTime`: The start time in HH:MM format (e.g., `"08:00"`), or special keywords:
+            * `"closed"`: Force closure (objects hidden)
+            * `"open"`: Force opening (objects shown 24/7)
+        * `endTime`: The end time in HH:MM format (e.g., `"18:00"`). Ignored if `startTime` is `"closed"` or `"open"`.
+    * **French Holiday Keywords** (automatically calculated):
+        * `new_year` - January 1st
+        * `easter_monday` - Monday after Easter (mobile date)
+        * `labor_day` - May 1st
+        * `victory_day` - May 8th (Victory in Europe Day)
+        * `ascension` - 39 days after Easter (mobile date)
+        * `whit_monday` - 50 days after Easter (mobile date)
+        * `bastille_day` - July 14th
+        * `assumption` - August 15th
+        * `all_saints` - November 1st
+        * `armistice` - November 11th
+        * `christmas` - December 25th
+    * **Example Configuration**:
+        ```json
+        "time_ranges": [
+            {
+                "days": ["bastille_day", "assumption"],
+                "startTime": "10:00",
+                "endTime": "14:00"
+            },
+            {
+                "days": ["french_holidays"],
+                "startTime": "closed"
+            },
+            {
+                "days": ["2025-12-24"],
+                "startTime": "08:00",
+                "endTime": "12:00"
+            },
+            {
+                "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                "startTime": "08:00",
+                "endTime": "18:00"
+            },
+            {
+                "days": ["Saturday", "Sunday"],
+                "startTime": "closed"
+            }
+        ]
+        ```
+        In this example (evaluated in order, first match wins):
+        1. Bastille Day and Assumption: open 10am-2pm (exception to general holiday closure)
+        2. All other French holidays: completely closed
+        3. December 24, 2025: open 8am-12pm (special Christmas Eve hours)
+        4. Weekdays: open 8am-6pm
+        5. Weekends: closed
 * `objects`: An array of objects to display on the map:
     * `name`: The name of the object.
     * `url`: The URL to retrieve the geolocation data for the object.
