@@ -88,15 +88,14 @@ docker run -d \
   -v $(pwd)/geoloc.json:/app/geoloc.json:ro \
   -e SERVER_NAME="your-domain.example.com" \
   -e APP_SECRET="$(openssl rand -hex 32)" \
-  -e GEOLOC_OBJECTS_FILE="/app/geoloc.json" \
+  -e GEOLOC_OBJECTS="/app/geoloc.json" \
   nicolascodemate/geoloc-map:latest
 ```
 
 **Required Environment Variables:**
 - `SERVER_NAME`: Your domain name or `:80` for HTTP-only
 - `APP_SECRET`: Generate with `openssl rand -hex 32`
-- `GEOLOC_OBJECTS`: JSON configuration string **OR**
-- `GEOLOC_OBJECTS_FILE`: Path to mounted JSON file (recommended)
+- `GEOLOC_OBJECTS`: JSON configuration string **OR** path to json file
 
 **Optional:**
 - `CADDY_SERVER_EXTRA_DIRECTIVES`: For custom SSL certificates
@@ -201,7 +200,7 @@ Paste your configuration and save. **Example:**
    ```
    Name: SERVER_NAME          Value: https://your-domain.example.com
    Name: APP_SECRET           Value: your-generated-secret-32-chars
-   Name: GEOLOC_OBJECTS_FILE  Value: /app/geoloc.json
+   Name: GEOLOC_OBJECTS       Value: /app/geoloc.json
    ```
 
 7. **Advanced container settings** → **Restart policy**:
@@ -260,7 +259,7 @@ nano .env.prod.local
 ```bash
 SERVER_NAME=https://your-domain.example.com
 APP_SECRET=your-generated-secret-32-chars
-# GEOLOC_OBJECTS_FILE is already set to /app/geoloc.json by default
+GEOLOC_OBJECTS=/app/geoloc.json
 ```
 
 **Deploy:**

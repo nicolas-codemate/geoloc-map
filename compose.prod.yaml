@@ -2,25 +2,20 @@
 services:
   php:
     # Use pre-built production image from DockerHub (built by CI/CD)
-    image: nicolascodemate/geoloc-map:latest
+    #    image: nicolascodemate/geoloc-map:latest
 
     # Optional: Uncomment to build locally instead of pulling from registry
-    # build:
-    #   context: .
-    #   target: frankenphp_prod
+    build:
+      context: .
+      target: frankenphp_prod
 
     env_file:
       - .env.prod.local
     volumes:
       - ./frankenphp/certs:/etc/caddy/certs:ro
-      # Mount external JSON configuration file for easy runtime modification
-      # Client can edit this file and run: docker compose exec php bin/console cache:clear
-      - ./geoloc.json:/app/geoloc.json:ro
     environment:
       SERVER_NAME: ${SERVER_NAME:-https://localhost}
-      APP_SECRET: ${APP_SECRET}
-      GEOLOC_OBJECTS: ${GEOLOC_OBJECTS}
-      GEOLOC_OBJECTS_FILE: ${GEOLOC_OBJECTS_FILE:-/app/geoloc.json}
+      APP_ENV: prod
       CADDY_SERVER_EXTRA_DIRECTIVES: ${CADDY_SERVER_EXTRA_DIRECTIVES:-}
 
 # Override volumes to use external volumes in production

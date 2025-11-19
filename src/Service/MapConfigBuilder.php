@@ -18,7 +18,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 readonly class MapConfigBuilder
 {
     public function __construct(
-        #[Autowire(env: 'json:GEOLOC_OBJECTS')]
+        #[Autowire(param: 'geoloc_objects')]
         private array $geolocatableObjects,
         private HttpClientInterface $httpClient,
     ) {

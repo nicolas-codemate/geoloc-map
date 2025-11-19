@@ -4,11 +4,9 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    env(GEOLOC_OBJECTS): '[]'
-    env(GEOLOC_OBJECTS_FILE): ''
-    # Use external JSON file if GEOLOC_OBJECTS_FILE is set, otherwise fallback to GEOLOC_OBJECTS env var
-    # Priority: GEOLOC_OBJECTS_FILE > GEOLOC_OBJECTS
-    geoloc_objects: '%env(default:json:GEOLOC_OBJECTS:json:file:resolve:GEOLOC_OBJECTS_FILE)%'
+    # Geolocation configuration - managed by .env files
+    geoloc_objects: '%env(default:json:geoloc_objects_inline:json:file:GEOLOC_OBJECTS)%'
+    geoloc_objects_inline: '%env(GEOLOC_OBJECTS)'
 
 services:
     # default configuration for services in *this* file

@@ -4,10 +4,7 @@ This guide explains how to configure geolocation objects for your maps using eit
 
 ## Configuration Methods
 
-You have **two options** for configuring geolocation objects:
-
-1. **Environment Variable** (GEOLOC_OBJECTS) - Simple, inline JSON
-2. **External JSON File** (GEOLOC_OBJECTS_FILE) - Better readability, easier to edit ⭐ **Recommended**
+ **Environment Variable** (GEOLOC_OBJECTS) - Simple, inline JSON or path to json file
 
 ## Option 1: Environment Variable (Inline JSON)
 
@@ -165,18 +162,6 @@ If using `GEOLOC_OBJECTS` environment variable:
    docker compose -f compose.yaml -f compose.prod.yaml restart
    ```
 
-## Configuration Priority
-
-When both methods are configured, the priority is:
-
-1. **GEOLOC_OBJECTS_FILE** (if set and file exists) - Takes precedence
-2. **GEOLOC_OBJECTS** (if GEOLOC_OBJECTS_FILE is empty or file doesn't exist) - Fallback
-
-This allows flexible deployment strategies:
-- Use file-based config in production for easier editing
-- Use env var config in CI/CD or containerized environments
-- Mix approaches across different environments
-
 ## Development vs Production
 
 ### Development (compose.yaml)
@@ -184,12 +169,11 @@ This allows flexible deployment strategies:
 ```yaml
 environment:
   GEOLOC_OBJECTS: ${GEOLOC_OBJECTS:-[]}
-  GEOLOC_OBJECTS_FILE: ${GEOLOC_OBJECTS_FILE:-}
 ```
 
 No bind mount by default. You can:
-- Use `GEOLOC_OBJECTS` env var
-- Or add a bind mount in `compose.override.yaml`
+- Use `GEOLOC_OBJECTS` env var with inline JSON
+- Or set `GEOLOC_OBJECTS=/app/geoloc.json` and add a bind mount in `compose.override.yaml`
 
 ### Production (compose.prod.yaml)
 
@@ -198,7 +182,7 @@ volumes:
   - ./geoloc.json:/app/geoloc.json:ro
 
 environment:
-  GEOLOC_OBJECTS_FILE: /app/geoloc.json
+  GEOLOC_OBJECTS: /app/geoloc.json
 ```
 
 Automatically uses `geoloc.json` file if it exists.

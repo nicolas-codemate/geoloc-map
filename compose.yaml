@@ -7,16 +7,10 @@ services:
       target: frankenphp_dev
     environment:
       SERVER_NAME: ${SERVER_NAME:-localhost}, php:80
-      APP_SECRET: ${APP_SECRET:-dev_secret_change_me_in_production}
-      GEOLOC_OBJECTS: ${GEOLOC_OBJECTS:-[]}
-      GEOLOC_OBJECTS_FILE: ${GEOLOC_OBJECTS_FILE:-}
       CADDY_SERVER_EXTRA_DIRECTIVES: ${CADDY_SERVER_EXTRA_DIRECTIVES:-}
     volumes:
       - caddy_data:/data
       - caddy_config:/config
-      # Optional: Mount external JSON config file (configure path in .env or docker-compose.override.yaml)
-      # Example: ./geoloc.json:/app/geoloc.json:ro
-      # Then set: GEOLOC_OBJECTS_FILE=/app/geoloc.json
     ports:
       # HTTP
       - target: 80

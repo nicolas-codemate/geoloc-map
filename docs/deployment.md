@@ -95,8 +95,8 @@ nano .env.prod.local
 SERVER_NAME=https://your-domain.example.com
 APP_SECRET=$(openssl rand -hex 32)
 
-# Geolocation configuration (uses external JSON file by default)
-# GEOLOC_OBJECTS_FILE=/app/geoloc.json is already set
+# Geolocation configuration (path to external JSON file)
+GEOLOC_OBJECTS=/app/geoloc.json
 ```
 
 ### Step 4: Configure Geolocation Objects
