@@ -28,6 +28,9 @@ final readonly class SmartJsonEnvVarProcessor implements EnvVarProcessorInterfac
     ) {
     }
 
+    /**
+     * @return array<int|string, mixed>
+     */
     public function getEnv(string $prefix, string $name, Closure $getEnv): array
     {
         $value = $getEnv($name);
@@ -62,6 +65,9 @@ final readonly class SmartJsonEnvVarProcessor implements EnvVarProcessorInterfac
         ];
     }
 
+    /**
+     * @return array<int|string, mixed>
+     */
     private function parseJson(string $json, string $varName, string $source): array
     {
         try {
@@ -93,6 +99,9 @@ final readonly class SmartJsonEnvVarProcessor implements EnvVarProcessorInterfac
         return $data;
     }
 
+    /**
+     * @return array<int|string, mixed>
+     */
     private function parseJsonFromFile(string $filePath, string $varName): array
     {
         $resolvedPath = $this->resolveFilePath($filePath);
