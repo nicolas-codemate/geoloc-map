@@ -53,6 +53,7 @@ final class MapLive
 
     protected function instantiateMap(): Map
     {
+        assert($this->mapName !== null, 'mapName must be set');
         $mapConfig = $this->mapConfigBuilder->buildMapConfig($this->mapName);
 
         $this->refreshInterval = $mapConfig->refreshInterval;
@@ -87,6 +88,7 @@ final class MapLive
     #[LiveAction]
     public function refreshMap(): void
     {
+        assert($this->mapName !== null, 'mapName must be set');
         $mapConfig = $this->mapConfigBuilder->buildMapConfig($this->mapName);
 
         $this->fetchGeolocationData($this->getMap(), $mapConfig);
@@ -94,7 +96,8 @@ final class MapLive
 
     private function fetchGeolocationData(Map $map, MapConfigInterface $mapConfig): void
     {
-        if (false === $mapConfig->timeRangeContainer->isCurrentTimeInRanges()) {
+        $now = new \Symfony\Component\Clock\DatePoint();
+        if (false === $mapConfig->timeRangeContainer->matches($now)) {
             $this->hasMarkers = false;
             $this->logger->info(sprintf('Out of time ranges: %s', $mapConfig->timeRangeContainer));
 

@@ -13,6 +13,21 @@ interface GeolocatableObjectInterface
         get;
     }
 
+    public string $url {
+        get;
+    }
+
+    public string $method {
+        get;
+    }
+
+    /**
+     * @var array<string, mixed>
+     */
+    public array $queryParams {
+        get;
+    }
+
     public HttpClientInterface $httpClient {
         get;
     }

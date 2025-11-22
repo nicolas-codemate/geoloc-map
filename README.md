@@ -29,6 +29,22 @@ Geoloc-Map uses JSON configuration to define maps and their geolocatable objects
     "default_longitude": 2.3514,
     "default_zoom_level": 12,
     "refresh_interval": 5000,
+    "time_ranges": [
+      {
+        "days": ["bastille_day"],
+        "startTime": "10:00",
+        "endTime": "14:00"
+      },
+      {
+        "days": ["french_holidays"],
+        "startTime": "closed"
+      },
+      {
+        "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "startTime": "08:00",
+        "endTime": "18:00"
+      }
+    ],
     "objects": [
       {
         "name": "My Vehicle",
@@ -329,6 +345,82 @@ docker run -d \
   -e CADDY_SERVER_EXTRA_DIRECTIVES="tls /etc/caddy/certs/cert.crt /etc/caddy/certs/key.key" \
   nicolascodemate/geoloc-map:latest
 ```
+
+### Configuration Details:
+
+* `mapName`: The name of the map, which also serves as the URI of the iframe. For example, my_car will be accessible at https://mydomain.com/my_car.
+* `default_latitude`: The default latitude for the map when no object is visible.
+* `default_longitude`: The default longitude for the map when no object is visible.
+* `default_zoom_level`: The default zoom level for the map when no object is visible.
+* `refresh_interval`: The interval (in milliseconds) at which the map will refresh to fetch new geolocation data.
+* Optional `time_ranges`: An array of time ranges with priority-based matching (first match wins).
+    * If omitted, objects will always be visible (24/7).
+    * Outside the specified time ranges, the map will display the default latitude and longitude with a message indicating no geolocatable objects.
+    * **Priority System**: Time ranges are evaluated in order. The first rule that matches the current date/time determines visibility. Place more restrictive rules (holidays) before general rules (weekdays).
+    * Each time range includes:
+        * `days`: An array of day specifiers. Supported formats:
+            * **Day of week**: `"Monday"`, `"Tuesday"`, etc.
+            * **Fixed date** (MM-DD): `"05-01"` for May 1st (any year)
+            * **Full date** (YYYY-MM-DD): `"2025-12-24"` for a specific date
+            * **All French holidays**: `"french_holidays"` for all 11 French public holidays at once
+            * **Individual French holiday keywords**: `"labor_day"`, `"easter_monday"`, `"bastille_day"`, etc. (see list below)
+        * `startTime`: The start time in HH:MM format (e.g., `"08:00"`), or special keywords:
+            * `"closed"`: Force closure (objects hidden)
+            * `"open"`: Force opening (objects shown 24/7)
+        * `endTime`: The end time in HH:MM format (e.g., `"18:00"`). Ignored if `startTime` is `"closed"` or `"open"`.
+    * **French Holiday Keywords** (automatically calculated):
+        * `new_year` - January 1st
+        * `easter_monday` - Monday after Easter (mobile date)
+        * `labor_day` - May 1st
+        * `victory_day` - May 8th (Victory in Europe Day)
+        * `ascension` - 39 days after Easter (mobile date)
+        * `whit_monday` - 50 days after Easter (mobile date)
+        * `bastille_day` - July 14th
+        * `assumption` - August 15th
+        * `all_saints` - November 1st
+        * `armistice` - November 11th
+        * `christmas` - December 25th
+    * **Example Configuration**:
+        ```json
+        "time_ranges": [
+            {
+                "days": ["bastille_day", "assumption"],
+                "startTime": "10:00",
+                "endTime": "14:00"
+            },
+            {
+                "days": ["french_holidays"],
+                "startTime": "closed"
+            },
+            {
+                "days": ["2025-12-24"],
+                "startTime": "08:00",
+                "endTime": "12:00"
+            },
+            {
+                "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                "startTime": "08:00",
+                "endTime": "18:00"
+            },
+            {
+                "days": ["Saturday", "Sunday"],
+                "startTime": "closed"
+            }
+        ]
+        ```
+        In this example (evaluated in order, first match wins):
+        1. Bastille Day and Assumption: open 10am-2pm (exception to general holiday closure)
+        2. All other French holidays: completely closed
+        3. December 24, 2025: open 8am-12pm (special Christmas Eve hours)
+        4. Weekdays: open 8am-6pm
+        5. Weekends: closed
+* `objects`: An array of objects to display on the map:
+    * `name`: The name of the object.
+    * `url`: The URL to retrieve the geolocation data for the object.
+    * `query_params`: The query parameters to include in the request.
+    * `latitude_json_path`: The JSON path to extract the latitude from the response.
+    * `longitude_json_path`: The JSON path to extract the longitude from the response.
+    * `enable_sandbox`: set to true and omit all other param except name to enable a sandbox mode. It will generate some random coordinate.
 
 ---
 

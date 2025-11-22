@@ -30,4 +30,8 @@ interface MapConfigInterface
     public array $geolocatableObjects {
         get;
     }
+
+    public TimeRangeContainer $timeRangeContainer {
+        get;
+    }
 }
