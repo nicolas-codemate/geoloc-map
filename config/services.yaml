@@ -25,10 +25,5 @@ services:
             - '../src/Model/'
             - '../src/Kernel.php'
 
-    # Custom env var processor with project directory injection
-    App\DependencyInjection\SmartJsonEnvVarProcessor:
-        arguments:
-            $projectDir: '%kernel.project_dir%'
-
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

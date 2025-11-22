@@ -6,6 +6,7 @@ namespace App\DependencyInjection;
 
 use Closure;
 use JsonException;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
@@ -24,6 +25,7 @@ use function is_string;
 final readonly class SmartJsonEnvVarProcessor implements EnvVarProcessorInterface
 {
     public function __construct(
+        #[Autowire(param: 'kernel.project_dir')]
         private string $projectDir,
     ) {
     }
