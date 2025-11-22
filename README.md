@@ -23,38 +23,54 @@ Geoloc-Map uses JSON configuration to define maps and their geolocatable objects
 **Quick example:**
 ```json
 [
-  {
-    "mapName": "my_car",
-    "default_latitude": 48.8575,
-    "default_longitude": 2.3514,
-    "default_zoom_level": 12,
-    "refresh_interval": 5000,
-    "time_ranges": [
-      {
-        "days": ["bastille_day"],
-        "startTime": "10:00",
-        "endTime": "14:00"
-      },
-      {
-        "days": ["french_holidays"],
-        "startTime": "closed"
-      },
-      {
-        "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-        "startTime": "08:00",
-        "endTime": "18:00"
-      }
-    ],
-    "objects": [
-      {
-        "name": "My Vehicle",
-        "url": "https://gps-api.example.com/location",
-        "query_params": {"device_id": "car_001"},
-        "latitude_json_path": "location.lat",
-        "longitude_json_path": "location.lng"
-      }
-    ]
-  }
+    {
+        "mapName": "my_car",
+        "default_latitude": 48.8575,
+        "default_longitude": 2.3514,
+        "default_zoom_level": 12,
+        "refresh_interval": 5000,
+        "time_ranges": [
+            {
+                "days": ["bastille_day"],
+                "startTime": "10:00",
+                "endTime": "14:00"
+            },
+            {
+                "days": ["french_holidays"],
+                "startTime": "closed"
+            },
+            {
+                "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                "startTime": "08:00",
+                "endTime": "12:00"
+            },
+            {
+                "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                "startTime": "14:00",
+                "endTime": "18:00"
+            },
+            {
+                "days": ["Saturday"],
+                "startTime": "09:00",
+                "endTime": "12:00"
+            }
+        ],
+        "objects": [
+            {
+                "name": "Mon super véhicule",
+                "url": "https://my_jeedom_domain.com/core/api/jeeApi.php",
+                "query_params": {
+                    "apikey": "**JEEDOM_API_KEY**",
+                    "method": "get",
+                    "plugin": "jMQTT",
+                    "type": "cmd",
+                    "id": "[779,780]"
+                },
+                "latitude_json_path": "779",
+                "longitude_json_path": "780"
+            }
+        ]
+    }
 ]
 ```
 
@@ -62,7 +78,7 @@ Access your map at: `https://your-domain.com/my_car`
 
 **📖 For complete configuration options, examples, and best practices, see:**
 - **[Configuration Guide](docs/configuration.md)** - Detailed documentation
-- **[geoloc.example.json](GEOLOC_OBJECTS.example.json)** - Template with examples
+- **[geoloc.example.json](geoloc.example.json)** - Template with examples
 
 ## Production Deployment
 
@@ -143,113 +159,37 @@ Then deploy the container:
 7. **Run** the container
 8. Access your maps at: `http://localhost/{mapName}`
 
-### Portainer Deployment
+### Portainer Quick Setup
 
-#### Step 1: Create Volumes for Certificate Persistence
-
+**⚠️ First, create volumes for certificate persistence:**
 Go to **Volumes** → **Add volume**:
-- Name: `caddy_data` → Click **Create the volume**
-- Name: `caddy_config` → Click **Create the volume**
+- Name: `caddy_data` → Create
+- Name: `caddy_config` → Create
 
-These volumes will persist Let's Encrypt certificates across container updates.
-
-#### Step 2: Prepare Configuration File
-
-On your server, create the configuration file:
-
-```bash
-# SSH to your server
-ssh user@your-server
-
-# Create directory
-mkdir -p /opt/geoloc-map
-
-# Create configuration file
-nano /opt/geoloc-map/geoloc.json
-```
-
-Paste your configuration and save. **Example:**
-```json
-[
-  {
-    "mapName": "fleet",
-    "default_latitude": 48.8575,
-    "default_longitude": 2.3514,
-    "default_zoom_level": 12,
-    "refresh_interval": 10000,
-    "objects": [
-      {
-        "name": "Vehicle 1",
-        "enable_sandbox": true
-      }
-    ]
-  }
-]
-```
-
-#### Step 3: Deploy Container in Portainer
+Then create the container:
 
 1. Go to **Containers** → **Add container**
-
-2. **Name**: `geoloc-map`
-
-3. **Image**: `nicolascodemate/geoloc-map:latest`
-
-4. **Network ports configuration**:
-   - Click **publish a new network port**
-   - `80:80/tcp` → Add
-   - `443:443/tcp` → Add
-
-5. **Advanced container settings** → **Volumes** tab:
-
-   **Volume mapping:**
-   - Click **map additional volume**
-   - Container: `/data` → Volume: `caddy_data` → **Bind** mode
-   - Click **map additional volume**
-   - Container: `/config` → Volume: `caddy_config` → **Bind** mode
-   - Click **map additional volume**
-   - Container: `/app/geoloc.json` → Host: `/opt/geoloc-map/geoloc.json` → **Bind** mode, **Read-only** ✓
-
-6. **Advanced container settings** → **Env** tab:
-
-   Click **add environment variable** for each:
+2. **Image**: `nicolascodemate/geoloc-map:latest`
+3. **Network ports**:
+   - `80:80/tcp`
+   - `443:443/tcp`
+4. **Environment variables**:
    ```
-   Name: SERVER_NAME          Value: https://your-domain.example.com
-   Name: APP_SECRET           Value: your-generated-secret-32-chars
-   Name: GEOLOC_OBJECTS       Value: /app/geoloc.json
+   SERVER_NAME=your-domain.example.com
+   APP_SECRET=your-generated-secret
+   GEOLOC_OBJECTS=your-json-config
    ```
+5. **Volumes** (required for certificate persistence):
+   - `caddy_data:/data`
+   - `caddy_config:/config`
 
-7. **Advanced container settings** → **Restart policy**:
-   - Select: `Unless stopped`
+   Optional (if using custom certificates):
+   - `/host/path/to/certs:/etc/caddy/certs:ro`
+6. **Deploy the container**
 
-8. Click **Deploy the container**
+### Option B: Build from Source
 
-#### Step 4: Verify Deployment
-
-1. Check logs: **Containers** → `geoloc-map` → **Logs**
-2. Look for: `certificate obtained successfully`
-3. Access: `https://your-domain.example.com/fleet`
-
-#### Updating Configuration
-
-To modify `geoloc.json` without redeploying:
-
-```bash
-# Edit on server
-nano /opt/geoloc-map/geoloc.json
-
-# Clear Symfony cache via Portainer:
-# Containers → geoloc-map → Console → Connect
-# Then run: bin/console cache:clear
-
-# Or restart container in Portainer
-```
-
-Changes are visible immediately after cache clear!
-
-### Option B: Using Docker Compose (Recommended for Server Deployments)
-
-Deploy using Docker Compose with the pre-built image from DockerHub.
+For customization or development.
 
 **⚠️ First, create persistent volumes:**
 ```bash
@@ -257,78 +197,13 @@ docker volume create caddy_data
 docker volume create caddy_config
 ```
 
-**Setup configuration:**
-```bash
-# Clone or download the compose files
-git clone https://github.com/nicolascodemate/geoloc-map.git
-cd geoloc-map
-
-# Create your configuration
-cp geoloc.example.json geoloc.json
-nano geoloc.json  # Edit with your configuration
-
-# Create environment file
-nano .env.prod.local
-```
-
-**Example `.env.prod.local`:**
-```bash
-SERVER_NAME=https://your-domain.example.com
-APP_SECRET=your-generated-secret-32-chars
-GEOLOC_OBJECTS=/app/geoloc.json
-```
-
-**Deploy:**
-```bash
-# Pull the latest image and start
-docker compose -f compose.yaml -f compose.prod.yaml pull
-docker compose -f compose.yaml -f compose.prod.yaml up -d
-```
-
-**Update to latest version:**
-```bash
-docker compose -f compose.yaml -f compose.prod.yaml pull
-docker compose -f compose.yaml -f compose.prod.yaml up -d
-```
-
-**Note:** The production compose file uses the pre-built image from DockerHub (built automatically by CI/CD). No build step is required on the server.
-
----
-
-## Development
-
-### Local Development
-
-For local development with live code reloading:
+Then build and deploy:
 
 ```bash
-# Install dependencies
-make composer c=install
-
-# Start development environment
-make up
-
-# Access at http://localhost:8080
-```
-
-The development compose file builds the image locally with the `frankenphp_dev` target.
-
-### Building Locally (Optional)
-
-If you need to build the production image locally instead of using the pre-built one:
-
-```bash
-# Uncomment the build section in compose.prod.yaml
-# Then build:
 docker compose -f compose.yaml -f compose.prod.yaml build --pull --no-cache
-
-# Run with locally built image
-docker compose -f compose.yaml -f compose.prod.yaml up -d
+SERVER_NAME=your-domain-name.example.com \
+docker compose -f compose.yaml -f compose.prod.yaml up --wait
 ```
-
-**Note:** This is rarely needed as the image is automatically built and published by GitHub Actions on every push to `main`.
-
----
 
 ### Custom SSL Certificates
 
@@ -421,8 +296,6 @@ docker run -d \
     * `latitude_json_path`: The JSON path to extract the latitude from the response.
     * `longitude_json_path`: The JSON path to extract the longitude from the response.
     * `enable_sandbox`: set to true and omit all other param except name to enable a sandbox mode. It will generate some random coordinate.
-
----
 
 ## Installation
 
