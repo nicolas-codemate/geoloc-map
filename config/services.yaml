@@ -5,8 +5,10 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     # Geolocation configuration - managed by .env files
-    geoloc_objects: '%env(default:json:geoloc_objects_inline:json:file:GEOLOC_OBJECTS)%'
-    geoloc_objects_inline: '%env(GEOLOC_OBJECTS)'
+    # GEOLOC_OBJECTS can be either:
+    #   - A file path ending with .json (e.g., ./geoloc.json)
+    #   - Inline JSON string (e.g., '[{"mapName":"test"}]')
+    geoloc_objects: '%env(smart_json:GEOLOC_OBJECTS)%'
 
 services:
     # default configuration for services in *this* file
@@ -19,10 +21,14 @@ services:
     App\:
         resource: '../src/'
         exclude:
-            - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Model/'
             - '../src/Kernel.php'
+
+    # Custom env var processor with project directory injection
+    App\DependencyInjection\SmartJsonEnvVarProcessor:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

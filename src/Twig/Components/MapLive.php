@@ -132,12 +132,14 @@ final class MapLive
 
     private function getObjectCoordinates(GeolocatableObjectInterface $geolocatableObject, MapConfigInterface $mapConfig): ?Coordinates
     {
+        $cacheKey = $this->generateCacheKey($geolocatableObject->name);
+
         if ($geolocatableObject->sandbox) {
             // if the object is sandboxed, we mock the coordinates base either on the default coordinates or on the previously cached coordinates
             $baseMockCoordinates = $mapConfig->defaultCoordinates;
 
             // check if the object is already cached
-            $cachedItem = $this->geolocatedObjectsCache->getItem($geolocatableObject->name);
+            $cachedItem = $this->geolocatedObjectsCache->getItem($cacheKey);
             if ($cachedItem->isHit()) {
                 // if cached, use the cached coordinates as base for mocking
                 $baseMockCoordinates = $cachedItem->get();
@@ -152,7 +154,7 @@ final class MapLive
         }
 
         // check if the object is already cached. If it is, we return the cached coordinates, no need to fetch, to reduce load on the API. Cache is shared across all instances.
-        $cachedItem = $this->geolocatedObjectsCache->getItem($geolocatableObject->name);
+        $cachedItem = $this->geolocatedObjectsCache->getItem($cacheKey);
         if ($cachedItem->isHit()) {
             // if cached, return the cached coordinates
             return $cachedItem->get();
@@ -191,5 +193,10 @@ final class MapLive
         );
 
         return $coordinates;
+    }
+
+    private function generateCacheKey(string $objectName): string
+    {
+        return 'geoloc_' . md5($objectName);
     }
 }
