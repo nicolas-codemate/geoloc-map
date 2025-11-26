@@ -42,6 +42,9 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-interaction
 
+      - name: Setup test environment
+        run: echo 'GEOLOC_OBJECTS=./tests/Fixtures/geoloc_test.json' >> .env.test
+
       - name: Run PHPStan (Level 8)
         run: vendor/bin/phpstan analyze --configuration=phpstan.dist.neon
 

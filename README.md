@@ -1,5 +1,7 @@
 # geoloc-map
 
+[![CI](https://github.com/nicolas-codemate/geoloc-map/actions/workflows/ci.yml/badge.svg)](https://github.com/nicolas-codemate/geoloc-map/actions/workflows/ci.yml)
+
 This project provides a simple and flexible way to geolocate multiple objects based on environment variable. Each object is associated with a specific source from which its geolocation data is retrieved.
 
 ## Features
