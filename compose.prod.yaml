@@ -13,6 +13,9 @@ services:
       - .env.prod.local
     volumes:
       - ./frankenphp/certs:/etc/caddy/certs:ro
+      # Optional: uncomment to use external JSON config file (recommended for complex configs)
+      # Then set GEOLOC_OBJECTS=/app/geoloc.json in .env.prod.local
+      # - ./geoloc.json:/app/geoloc.json:ro
     environment:
       SERVER_NAME: ${SERVER_NAME:-https://localhost}
       APP_ENV: prod

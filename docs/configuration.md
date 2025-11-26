@@ -45,7 +45,7 @@ GEOLOC_OBJECTS='[{"mapName":"my_car","default_latitude":48.8575,"default_longitu
    # Or use your preferred editor
    ```
 
-3. **The file is automatically mounted** in production (compose.prod.yaml)
+3. **Enable the volume mount** in `compose.prod.yaml` (uncomment the geoloc.json line)
 
 ### File Structure
 
@@ -177,15 +177,20 @@ No bind mount by default. You can:
 
 ### Production (compose.prod.yaml)
 
+To use an external JSON file, uncomment the volume mount in `compose.prod.yaml`:
+
 ```yaml
 volumes:
+  - ./frankenphp/certs:/etc/caddy/certs:ro
+  # Uncomment the line below to use external JSON config file
   - ./geoloc.json:/app/geoloc.json:ro
-
-environment:
-  GEOLOC_OBJECTS: /app/geoloc.json
 ```
 
-Automatically uses `geoloc.json` file if it exists.
+Then set in `.env.prod.local`:
+
+```bash
+GEOLOC_OBJECTS=/app/geoloc.json
+```
 
 ## Examples
 

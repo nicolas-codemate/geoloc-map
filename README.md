@@ -173,11 +173,11 @@ Then create the container:
 3. **Network ports**:
    - `80:80/tcp`
    - `443:443/tcp`
-4. **Environment variables**:
+4. **Environment variables** (see [Configuration Guide](docs/configuration.md) for GEOLOC_OBJECTS format):
    ```
    SERVER_NAME=your-domain.example.com
    APP_SECRET=your-generated-secret
-   GEOLOC_OBJECTS=your-json-config
+   GEOLOC_OBJECTS=[{"mapName":"demo","default_latitude":48.8575,...}]
    ```
 5. **Volumes** (required for certificate persistence):
    - `caddy_data:/data`
