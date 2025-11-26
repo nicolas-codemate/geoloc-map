@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Enum;
 
-use DateTimeImmutable;
-
 enum FrenchHoliday: string
 {
     case NewYear = 'new_year';

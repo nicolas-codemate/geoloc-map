@@ -13,6 +13,8 @@ use App\Model\MapConfigInterface;
 use App\Service\MapConfigBuilder;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Clock\ClockAwareTrait;
+use Symfony\Component\Clock\DatePoint;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
@@ -26,12 +28,14 @@ use Symfony\UX\Map\Live\ComponentWithMapTrait;
 use Symfony\UX\Map\Map;
 use Symfony\UX\Map\Marker;
 use Symfony\UX\Map\Point;
+use Throwable;
 
 #[AsLiveComponent]
 final class MapLive
 {
     use DefaultActionTrait;
     use ComponentWithMapTrait;
+    use ClockAwareTrait;
 
     #[LiveProp]
     public ?string $mapName = null;
@@ -96,7 +100,7 @@ final class MapLive
 
     private function fetchGeolocationData(Map $map, MapConfigInterface $mapConfig): void
     {
-        $now = new \Symfony\Component\Clock\DatePoint();
+        $now = new DatePoint($this->now()->format(\DateTimeInterface::ATOM));
         if (false === $mapConfig->timeRangeContainer->matches($now)) {
             $this->hasMarkers = false;
             $this->logger->info(sprintf('Out of time ranges: %s', $mapConfig->timeRangeContainer));
@@ -178,7 +182,7 @@ final class MapLive
             $this->logger->critical($exception->getMessage());
 
             return null;
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             $this->logger->critical(sprintf('Unexpected error: %s', $exception->getMessage()), [
                 'url' => $geolocatableObject->url,
                 'method' => $geolocatableObject->method,
