@@ -25,7 +25,7 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           extensions: ctype, iconv, intl, apcu, opcache, zip
-          coverage: none
+          coverage: pcov
           tools: composer:v2
 
       - name: Get Composer cache directory
@@ -48,8 +48,15 @@ jobs:
       - name: Run PHPStan (Level 8)
         run: vendor/bin/phpstan analyze --configuration=phpstan.dist.neon
 
-      - name: Run PHPUnit
-        run: vendor/bin/phpunit
+      - name: Run PHPUnit with coverage
+        run: vendor/bin/phpunit --coverage-clover=coverage.xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: coverage.xml
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Check Symfony container
         run: php bin/console lint:container
