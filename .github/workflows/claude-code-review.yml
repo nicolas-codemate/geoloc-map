@@ -11,13 +11,32 @@ on:
     #   - "src/**/*.jsx"
 
 jobs:
+  check-trigger:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check if last commit mentions @claude
+        id: check
+        run: |
+          LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "Last commit message: $LAST_COMMIT_MSG"
+          if echo "$LAST_COMMIT_MSG" | grep -qi "@claude"; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+            echo "✅ Found @claude in commit message"
+          else
+            echo "should_run=false" >> $GITHUB_OUTPUT
+            echo "⏭️ No @claude mention found, skipping review"
+          fi
+
   claude-review:
-    # Optional: Filter by PR author
-    # if: |
-    #   github.event.pull_request.user.login == 'external-contributor' ||
-    #   github.event.pull_request.user.login == 'new-developer' ||
-    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
-    
+    needs: check-trigger
+    if: needs.check-trigger.outputs.should_run == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
