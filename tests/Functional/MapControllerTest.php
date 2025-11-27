@@ -1,0 +1,81 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tests\Functional;
+
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+
+/**
+ * Functional tests for MapController HTTP responses.
+ *
+ * Note: LiveComponent state (isLoading, hasMarkers) is only updated after JavaScript hydration.
+ * For testing time range logic, see TimeRangeIntegrationTest which tests the business logic directly.
+ * These tests verify:
+ * - Correct HTTP responses (200/404)
+ * - Map configuration loading
+ * - LiveComponent presence in the rendered HTML
+ */
+class MapControllerTest extends WebTestCase
+{
+    public function testMapNotFoundReturns404(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/non_existent_map');
+
+        self::assertResponseStatusCodeSame(404);
+    }
+
+    public function testMapAlwaysOpenReturns200(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/test_map_always_open');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-controller="live"]');
+        self::assertSelectorExists('.map-overlay');
+    }
+
+    public function testMapWeekdaysReturns200(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/test_map_weekdays');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-controller="live"]');
+    }
+
+    public function testMapHolidaysReturns200(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/test_map_holidays');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('[data-controller="live"]');
+    }
+
+    public function testMapContainsLeafletMap(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/test_map_always_open');
+
+        self::assertResponseIsSuccessful();
+        // Check that Leaflet map container is rendered
+        self::assertSelectorExists('[data-controller~="symfony--ux-leaflet-map--map"]');
+    }
+
+    public function testMapHasRefreshInterval(): void
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/test_map_always_open');
+
+        self::assertResponseIsSuccessful();
+        // Check that data-poll attribute is present for auto-refresh
+        self::assertSelectorExists('[data-poll]');
+
+        // Verify the polling action is set to refreshMap
+        $liveComponent = $crawler->filter('[data-controller="live"]');
+        $this->assertStringContainsString('refreshMap', $liveComponent->attr('data-poll'));
+    }
+}
+

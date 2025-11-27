@@ -32,14 +32,16 @@ These commands need to be run **only once** on your production server.
 Once the volumes are created, deploy normally:
 
 ```bash
-# Build fresh production image
-docker compose -f compose.yaml -f compose.prod.yaml build --pull --no-cache
+# Pull latest production image from DockerHub
+docker compose -f compose.yaml -f compose.prod.yaml pull
 
 # Start container (certificates will be requested on first run only)
 SERVER_NAME=your-domain-name.example.com \
 APP_SECRET=your-secret \
-docker compose -f compose.yaml -f compose.prod.yaml up --wait
+docker compose -f compose.yaml -f compose.prod.yaml up -d
 ```
+
+**Note:** The production image is automatically built and published to DockerHub by CI/CD on every push to `main`. No build step is required on the server.
 
 On the first deployment, Caddy will request a Let's Encrypt certificate and store it in the `caddy_data` volume.
 
@@ -56,12 +58,17 @@ You can now safely redeploy without requesting new certificates:
 # Stop and remove containers (volumes are preserved)
 docker compose -f compose.yaml -f compose.prod.yaml down
 
-# Update your code
-git pull
+# Pull latest image from DockerHub (if updated)
+docker compose -f compose.yaml -f compose.prod.yaml pull
 
-# Rebuild and restart (existing certificates will be reused)
-docker compose -f compose.yaml -f compose.prod.yaml build --pull
-docker compose -f compose.yaml -f compose.prod.yaml up --wait
+# Restart (existing certificates will be reused)
+docker compose -f compose.yaml -f compose.prod.yaml up -d
+```
+
+**Simpler update command:**
+```bash
+docker compose -f compose.yaml -f compose.prod.yaml pull && \
+docker compose -f compose.yaml -f compose.prod.yaml up -d
 ```
 
 **Important**: Never use `docker compose down -v` in production, as this would attempt to remove the volumes (though external volumes are protected).

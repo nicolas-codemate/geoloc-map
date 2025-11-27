@@ -1,0 +1,78 @@
+[
+    {
+        "mapName": "test_map_always_open",
+        "default_latitude": 48.8575,
+        "default_longitude": 2.3514,
+        "default_zoom_level": 12,
+        "refresh_interval": 5000,
+        "time_ranges": [],
+        "objects": [
+            {
+                "name": "Test Object",
+                "url": "https://example.com/api",
+                "latitude_json_path": "lat",
+                "longitude_json_path": "lng",
+                "enable_sandbox": true
+            }
+        ]
+    },
+    {
+        "mapName": "test_map_weekdays",
+        "default_latitude": 48.8575,
+        "default_longitude": 2.3514,
+        "default_zoom_level": 12,
+        "refresh_interval": 5000,
+        "time_ranges": [
+            {
+                "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                "startTime": "08:00",
+                "endTime": "18:00"
+            },
+            {
+                "days": ["Saturday", "Sunday"],
+                "startTime": "closed"
+            }
+        ],
+        "objects": [
+            {
+                "name": "Test Object",
+                "url": "https://example.com/api",
+                "latitude_json_path": "lat",
+                "longitude_json_path": "lng",
+                "enable_sandbox": true
+            }
+        ]
+    },
+    {
+        "mapName": "test_map_holidays",
+        "default_latitude": 48.8575,
+        "default_longitude": 2.3514,
+        "default_zoom_level": 12,
+        "refresh_interval": 5000,
+        "time_ranges": [
+            {
+                "days": ["bastille_day"],
+                "startTime": "10:00",
+                "endTime": "14:00"
+            },
+            {
+                "days": ["french_holidays"],
+                "startTime": "closed"
+            },
+            {
+                "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                "startTime": "08:00",
+                "endTime": "18:00"
+            }
+        ],
+        "objects": [
+            {
+                "name": "Test Object",
+                "url": "https://example.com/api",
+                "latitude_json_path": "lat",
+                "longitude_json_path": "lng",
+                "enable_sandbox": true
+            }
+        ]
+    }
+]

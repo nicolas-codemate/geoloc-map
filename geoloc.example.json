@@ -1,0 +1,51 @@
+[
+  {
+    "mapName": "demo_sandbox",
+    "default_latitude": 48.8575,
+    "default_longitude": 2.3514,
+    "default_zoom_level": 12,
+    "refresh_interval": 5000,
+    "objects": [
+      {
+        "name": "Demo Object 1 (Sandbox)",
+        "enable_sandbox": true
+      },
+      {
+        "name": "Demo Object 2 (Sandbox)",
+        "enable_sandbox": true
+      }
+    ]
+  },
+  {
+    "mapName": "my_car",
+    "default_latitude": 45.764043,
+    "default_longitude": 4.835659,
+    "default_zoom_level": 15,
+    "refresh_interval": 10000,
+    "time_ranges": [
+      {
+        "days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday"
+        ],
+        "startTime": "08:00",
+        "endTime": "18:00"
+      }
+    ],
+    "objects": [
+      {
+        "name": "My Vehicle",
+        "url": "https://your-gps-api.example.com/location",
+        "query_params": {
+          "device_id": "your_device_id",
+          "api_key": "your_api_key"
+        },
+        "latitude_json_path": "data.latitude",
+        "longitude_json_path": "data.longitude"
+      }
+    ]
+  }
+]

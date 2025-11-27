@@ -21,7 +21,7 @@ class MapController extends AbstractController
         try {
             return $this->render('map.html.twig', [
                 'mapName' => $mapName,
-                'height' => $request->get('height', 800),
+                'height' => $request->query->getInt('height', 800),
             ]);
 
         } catch (RuntimeError $exception) {
