@@ -128,3 +128,40 @@ services:
             - .env.prod.local
         # ...
 ```
+
+## Updating Map Configuration
+
+When using an external JSON configuration file (recommended), follow these steps to update the map configuration:
+
+### Configuration Setup
+
+1. Create your configuration file (e.g., `geoloc.json`) on the host machine
+2. Mount it as a volume in `compose.prod.yaml`:
+   ```yaml
+   volumes:
+     - ./geoloc.json:/app/geoloc.json:ro
+   ```
+3. Set the environment variable in `.env.prod.local`:
+   ```env
+   GEOLOC_OBJECTS=geoloc.json
+   ```
+
+### Applying Configuration Changes
+
+After modifying `geoloc.json`, you must restart the container for changes to take effect:
+
+```console
+docker compose -f compose.yaml -f compose.prod.yaml restart php
+```
+
+> [!NOTE]
+> A simple `cache:clear` is not sufficient because PHP's OPcache caches the compiled bytecode in production. Restarting the container clears OPcache and forces PHP to reload the configuration file.
+
+### Why Restart is Required
+
+In production mode, Symfony and PHP optimize performance through multiple caching layers:
+- **Symfony container cache**: Compiles dependency injection configuration
+- **PHP OPcache**: Caches compiled PHP bytecode
+
+The `env_file` directive loads environment variables at container startup, not dynamically. Combined with OPcache, this means configuration changes require a container restart to be applied.
+
