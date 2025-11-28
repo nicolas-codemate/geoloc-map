@@ -406,7 +406,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         log_channel?: scalar|null, // The channel of log message. Null to let Symfony decide. // Default: null
  *     }>,
  *     web_link?: bool|array{ // Web links configuration
- *         enabled?: bool, // Default: false
+ *         enabled?: bool, // Default: true
  *     },
  *     lock?: bool|string|array{ // Lock configuration
  *         enabled?: bool, // Default: false

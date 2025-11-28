@@ -40,7 +40,7 @@ final class MapLive
     #[LiveProp]
     public ?string $mapName = null;
     #[LiveProp]
-    public int $height = 500;
+    public ?int $height = null;
     #[LiveProp]
     public ?int $refreshInterval = null;
     #[LiveProp]

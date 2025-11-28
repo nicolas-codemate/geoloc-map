@@ -77,5 +77,52 @@ class MapControllerTest extends WebTestCase
         $liveComponent = $crawler->filter('[data-controller="live"]');
         $this->assertStringContainsString('refreshMap', $liveComponent->attr('data-poll'));
     }
+
+    public function testMapDefaultHeightIsViewportHeight(): void
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/test_map_always_open');
+
+        self::assertResponseIsSuccessful();
+
+        // Check that the map uses 100vh by default (no height query param)
+        $mapElement = $crawler->filter('[data-controller~="symfony--ux-leaflet-map--map"]');
+        $style = $mapElement->attr('style');
+        $this->assertStringContainsString('height: 100vh', $style);
+
+        // Check that the overlay also uses 100vh
+        $html = $crawler->html();
+        $this->assertStringContainsString('height: 100vh', $html);
+    }
+
+    public function testMapCustomHeightFromQueryParam(): void
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/test_map_always_open?height=500');
+
+        self::assertResponseIsSuccessful();
+
+        // Check that the map uses the custom height in pixels
+        $mapElement = $crawler->filter('[data-controller~="symfony--ux-leaflet-map--map"]');
+        $style = $mapElement->attr('style');
+        $this->assertStringContainsString('height: 500px', $style);
+
+        // Check that the overlay also uses the custom height
+        $html = $crawler->html();
+        $this->assertStringContainsString('height: 500px', $html);
+    }
+
+    public function testMapCustomHeightDifferentValue(): void
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/test_map_always_open?height=800');
+
+        self::assertResponseIsSuccessful();
+
+        // Check that the map uses 800px
+        $mapElement = $crawler->filter('[data-controller~="symfony--ux-leaflet-map--map"]');
+        $style = $mapElement->attr('style');
+        $this->assertStringContainsString('height: 800px', $style);
+    }
 }
 
