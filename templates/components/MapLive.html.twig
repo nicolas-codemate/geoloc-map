@@ -1,3 +1,4 @@
+{% set mapHeight = height ? height ~ 'px' : '100vh' %}
 <div{{ attributes }}
     data-poll="delay({{ refreshInterval }})|refreshMap"
 >
@@ -7,7 +8,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: {{ height }}px;
+            height: {{ mapHeight }};
             backdrop-filter: blur(5px);
             transition: backdrop-filter 0.5s ease;
             z-index: 1000;
@@ -20,6 +21,25 @@
             backdrop-filter: blur(0px);
             transition: backdrop-filter 0.5s ease, z-index 0s 0.5s;
             z-index: 0;
+        }
+
+        .map-loading {
+            overflow: hidden;
+        }
+
+        /* Hide markers and tooltips during loading */
+        .map-loading .leaflet-marker-pane,
+        .map-loading .leaflet-tooltip-pane,
+        .map-loading .leaflet-popup-pane,
+        .map-loading .leaflet-shadow-pane {
+            visibility: hidden;
+        }
+
+        .map-loading.map-loaded .leaflet-marker-pane,
+        .map-loading.map-loaded .leaflet-tooltip-pane,
+        .map-loading.map-loaded .leaflet-popup-pane,
+        .map-loading.map-loaded .leaflet-shadow-pane {
+            visibility: visible;
         }
 
         .overlay-text {
@@ -44,8 +64,8 @@
         }
 
     </style>
-    <div style="position: relative;">
-        {{ ux_map(map, {'data-controller': 'map', style: 'height: ' ~ height ~ 'px;z-index:10'}) }}
+    <div style="position: relative;" class="map-loading {{ false == isLoading and hasMarkers ? 'map-loaded' : '' }}">
+        {{ ux_map(map, {'data-controller': 'map', style: 'height: ' ~ mapHeight ~ ';z-index:10'}) }}
 
         <div class="map-overlay {{ false == isLoading and hasMarkers ? 'deblur' : '' }}">
             {% if isLoading %}
