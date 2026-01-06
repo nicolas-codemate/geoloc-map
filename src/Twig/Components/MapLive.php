@@ -47,6 +47,8 @@ final class MapLive
     public bool $hasMarkers = true;
     #[LiveProp]
     public bool $isLoading = true;
+    #[LiveProp]
+    public string $customMessage = 'Aucune donnée de géolocalisation';
 
     public function __construct(
         private readonly MapConfigBuilder $mapConfigBuilder,
@@ -61,6 +63,7 @@ final class MapLive
         $mapConfig = $this->mapConfigBuilder->buildMapConfig($this->mapName);
 
         $this->refreshInterval = $mapConfig->refreshInterval;
+        $this->customMessage = $mapConfig->customMessage;
 
         $map = new Map('default')
             ->center(

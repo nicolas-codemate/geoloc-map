@@ -22,6 +22,7 @@
     "default_longitude": 4.835659,
     "default_zoom_level": 15,
     "refresh_interval": 10000,
+    "custom_message": "Véhicule non disponible",
     "time_ranges": [
       {
         "days": [
