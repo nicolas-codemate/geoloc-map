@@ -14,7 +14,7 @@ class MapConfig implements MapConfigInterface
         }
     }
 
-    private const string DEFAULT_CUSTOM_MESSAGE = 'Aucune donnée de géolocalisation';
+    public const string DEFAULT_CUSTOM_MESSAGE = 'Aucune donnée de géolocalisation';
 
     public function __construct(
         public string $mapName,

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Service;
 
+use App\Model\MapConfig;
 use App\Service\FrenchHolidayCalculator;
 use App\Service\MapConfigBuilder;
 use PHPUnit\Framework\TestCase;
@@ -69,7 +70,7 @@ class MapConfigBuilderTest extends TestCase
 
         $config = $builder->buildMapConfig('test_map');
 
-        $this->assertSame('Aucune donnée de géolocalisation', $config->customMessage);
+        $this->assertSame(MapConfig::DEFAULT_CUSTOM_MESSAGE, $config->customMessage);
     }
 
     public function testBuildMapConfigIgnoresInvalidCustomMessageTypes(): void
@@ -95,7 +96,7 @@ class MapConfigBuilderTest extends TestCase
 
         $config = $builder->buildMapConfig('test_map');
 
-        $this->assertSame('Aucune donnée de géolocalisation', $config->customMessage);
+        $this->assertSame(MapConfig::DEFAULT_CUSTOM_MESSAGE, $config->customMessage);
     }
 
     public function testBuildMapConfigWithEmptyCustomMessage(): void
