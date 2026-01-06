@@ -74,5 +74,59 @@
                 "enable_sandbox": true
             }
         ]
+    },
+    {
+        "mapName": "test_map_custom_message",
+        "default_latitude": 48.8575,
+        "default_longitude": 2.3514,
+        "default_zoom_level": 12,
+        "refresh_interval": 5000,
+        "custom_message": "Service temporairement indisponible",
+        "time_ranges": [
+            {
+                "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                "startTime": "08:00",
+                "endTime": "18:00"
+            },
+            {
+                "days": ["Saturday", "Sunday"],
+                "startTime": "closed"
+            }
+        ],
+        "objects": [
+            {
+                "name": "Test Object",
+                "enable_sandbox": true
+            }
+        ]
+    },
+    {
+        "mapName": "test_map_always_closed",
+        "default_latitude": 48.8575,
+        "default_longitude": 2.3514,
+        "default_zoom_level": 12,
+        "refresh_interval": 5000,
+        "time_ranges": [
+            {
+                "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+                "startTime": "closed"
+            }
+        ],
+        "objects": [
+            {
+                "name": "Test Object",
+                "enable_sandbox": true
+            }
+        ]
+    },
+    {
+        "mapName": "test_map_no_objects",
+        "default_latitude": 48.8575,
+        "default_longitude": 2.3514,
+        "default_zoom_level": 12,
+        "refresh_interval": 5000,
+        "custom_message": "Aucun véhicule disponible",
+        "time_ranges": [],
+        "objects": []
     }
 ]
