@@ -9,6 +9,7 @@ use App\Exception\InvalidCoordinateException;
 use App\Exception\InvalidCoordinatePathException;
 use App\Model\Coordinates;
 use App\Model\GeolocatableObjectInterface;
+use App\Model\MapConfig;
 use App\Model\MapConfigInterface;
 use App\Service\MapConfigBuilder;
 use Psr\Cache\CacheItemPoolInterface;
@@ -47,6 +48,8 @@ final class MapLive
     public bool $hasMarkers = true;
     #[LiveProp]
     public bool $isLoading = true;
+    #[LiveProp]
+    public string $customMessage = MapConfig::DEFAULT_CUSTOM_MESSAGE;
 
     public function __construct(
         private readonly MapConfigBuilder $mapConfigBuilder,
@@ -61,6 +64,7 @@ final class MapLive
         $mapConfig = $this->mapConfigBuilder->buildMapConfig($this->mapName);
 
         $this->refreshInterval = $mapConfig->refreshInterval;
+        $this->customMessage = $mapConfig->customMessage;
 
         $map = new Map('default')
             ->center(

@@ -32,6 +32,7 @@ Geoloc-Map uses JSON configuration to define maps and their geolocatable objects
         "default_longitude": 2.3514,
         "default_zoom_level": 12,
         "refresh_interval": 5000,
+        "custom_message": "Véhicule non disponible",
         "time_ranges": [
             {
                 "days": ["bastille_day"],
@@ -292,6 +293,8 @@ docker run -d \
         3. December 24, 2025: open 8am-12pm (special Christmas Eve hours)
         4. Weekdays: open 8am-6pm
         5. Weekends: closed
+* Optional `custom_message`: A custom message to display when no geolocation data is available (outside time ranges or when objects cannot be fetched). Default: `"Aucune donnée de géolocalisation"`.
+    * **Example**: `"Service momentanément indisponible"` or `"Véhicule non disponible"`
 * `objects`: An array of objects to display on the map:
     * `name`: The name of the object.
     * `url`: The URL to retrieve the geolocation data for the object.

@@ -34,4 +34,8 @@ interface MapConfigInterface
     public TimeRangeContainer $timeRangeContainer {
         get;
     }
+
+    public string $customMessage {
+        get;
+    }
 }

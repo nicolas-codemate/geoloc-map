@@ -104,6 +104,7 @@ GEOLOC_OBJECTS='[{"mapName":"my_car","default_latitude":48.8575,"default_longitu
 | `default_longitude` | float | ✅ | Default map center longitude |
 | `default_zoom_level` | integer | ✅ | Default zoom level (1-20) |
 | `refresh_interval` | integer | ✅ | Refresh interval in milliseconds |
+| `custom_message` | string | ❌ | Message displayed when no data is available (default: "Aucune donnée de géolocalisation") |
 | `time_ranges` | array | ❌ | Visibility time windows (see below) |
 | `objects` | array | ✅ | Array of geolocatable objects |
 
@@ -260,6 +261,7 @@ Only show vehicle position during business hours:
     "default_longitude": 2.3514,
     "default_zoom_level": 12,
     "refresh_interval": 10000,
+    "custom_message": "Véhicule non disponible en dehors des heures de service",
     "time_ranges": [
       {
         "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
@@ -282,7 +284,7 @@ Only show vehicle position during business hours:
 ]
 ```
 
-Outside Monday-Friday 8:00-18:00, the map shows default coordinates (48.8575, 2.3514).
+Outside Monday-Friday 8:00-18:00, the map shows default coordinates (48.8575, 2.3514) with the custom message.
 
 ### Example 4: Multiple Maps
 

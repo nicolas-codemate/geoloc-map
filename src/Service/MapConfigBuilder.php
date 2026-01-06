@@ -86,6 +86,10 @@ readonly class MapConfigBuilder
             }
         }
 
+        $customMessage = isset($config['custom_message']) && is_string($config['custom_message'])
+            ? $config['custom_message']
+            : MapConfig::DEFAULT_CUSTOM_MESSAGE;
+
         return new MapConfig(
             $mapName,
             new Coordinates(
@@ -98,6 +102,7 @@ readonly class MapConfigBuilder
                 $this->holidayCalculator,
                 ...$timeRanges,
             ),
+            $customMessage,
             ...$objects,
         );
     }
