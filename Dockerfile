@@ -93,6 +93,11 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 COPY --link frankenphp/conf.d/20-app.prod.ini $PHP_INI_DIR/app.conf.d/
 
+# Trust extra intermediate CAs required by upstream geolocation APIs that serve
+# an incomplete TLS chain (leaf only). See frankenphp/trusted-ca-certificates/README.md.
+COPY --link frankenphp/trusted-ca-certificates/*.crt /usr/local/share/ca-certificates/
+RUN update-ca-certificates
+
 # prevent the reinstallation of vendors at every changes in the source code
 COPY --link composer.* symfony.* ./
 RUN set -eux; \
